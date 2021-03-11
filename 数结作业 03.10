@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct Node
+{
+	int data;
+	struct Node* next;
+}sN,*psN;
+
+int main()
+{
+	int i = 0;
+	psN head, h[3], p;
+	head = NULL;
+	for (i = 0; i < 3; i++)
+	{
+		h[i] = (psN)malloc(sizeof(sN));
+		h[i]->data = 1 + i;
+		h[i]->next = NULL;
+		if (i == 0)
+		{
+			head = h[i];
+		}
+		else if (i != 2)
+		{
+			h[i - 1]->next = h[i];
+		}
+		else
+		{
+			h[i]->next = NULL;
+		}
+	}
+
+	p = (psN)malloc(sizeof(sN));
+	p->data = 4;
+	h[2]->next = p;
+	p->next = NULL;
+
+	printf("未删除结点前的数据：\n");
+	for (i = 0; i < 3; i++)
+	{
+		printf("%d ", h[i]->data);
+	}
+	printf("%d\n",p->data);
+	
+	h[0]->next = h[2];
+	free(h[1]);
+
+	printf("删除结点后的数据：\n");
+	for (i = 0; i < 3; i++)
+	{
+		printf("%d ", h[i]->data);
+	}
+	printf("%d\n", p->data);
+
+	return 0;
+}
