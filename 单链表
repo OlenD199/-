@@ -1,0 +1,123 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct Node
+{
+	int data;
+	struct Node* next;
+}Node,*LinkList;
+
+
+//创造一个新的链表表
+int Init_List(LinkList *head)
+{
+	*head = (LinkList)malloc(sizeof(Node));
+	if ((*head) == NULL)
+	{
+		return 0;
+	}
+	(*head)->next = NULL;
+	return 1;
+}
+
+//返回线性表中的元素个数
+int ListLength(LinkList head)
+{
+	int count = 0;
+	LinkList p = head->next;
+	while (p != NULL)
+	{
+		count++;
+		p = p->next;
+	}
+	return count;
+}
+
+//查找函数
+//当第pos个元素存在时，其赋值给e（得到第i个位置的元素赋值给e）
+int GetElem(LinkList head, int pos, int* e)
+{
+	int count = 1;//计数器
+	LinkList p = head->next;
+	while (p && count < pos)//顺指针向后查找，知道p指向第pos个节点或结点为空
+	{
+		count++;
+		p = p->next;
+	}
+	if (!p || pos > count)//第pos个结点不存在
+	{
+		return 0;
+	}
+	(*e) = p->data;
+	return 1;
+}
+
+//插入函数
+void ListDelete(LinkList head, int pos, int e)//在pos位置插入一个元素为e的数据
+{
+	int count = 0;//计数器
+	LinkList s, p = head;
+	while (p && count < pos - 1)//找到第pos位置的前驱，第pos-1个结点
+	{
+		count++;
+		p = p->next;//p代表pos位置的前驱，
+	}
+	if (!p || count > pos - 1)//假如说链表长为3，插入到第5个位置，则p表示NULL，!p则表示第4个位置不存在；
+							  //如果pos==0(或者等于负数)那么在该步骤中，p表示头结点为真，只能靠count > pos - 1来判断位置错误
+							  //总结一句话：!p排除pos大于表长+1的可能； count > pos - 1用来排除pos<=0的情况
+		return;
+	s = (LinkList)mallox(sizeof(Node));
+	s->data = e;
+	s->next = p->next;
+	p->next = s;
+}
+
+//删除函数
+void DeleteList(LinkList head, int pos,int* value)//删除pos位置得结点
+{
+	int count = 0;//计数器
+	LinkList q,p = head;
+	while (p->next && count < pos - 1)//找到pos位置的结点，p->next排除pos大于表长的可能；count < pos - 1表示找到pos-1位置的结点
+	{
+		count++;
+		p = p->next;
+	}
+	if (!p->next || count > pos - 1)//!p->next排除pos位置大于表厂的可能，count > pos - 1排除pos为0或负数的可能
+		return;
+	q = p->next;//q指向待删除的结点
+	p->next = q->next;
+	(*value) = q->data;
+	free(q);
+}
+
+//清空链表(不销毁头结点)
+void ClearList(LinkList* head)
+{
+	LinkList p;
+	while ((*head)->next)
+	{
+		p = (*head)->next;
+		(*head)->next = p->next;
+		free(p);	
+	}
+}
+
+//销毁链表(销毁头结点)
+void DestoryList(LinkList* head)
+{
+	LinkList p = head;
+	while (p)//最初销毁头结点，按照顺序依次删除结点
+	{
+		(*head) = (*head)->next;
+		free(p);
+		p = *head;
+	}
+}
+
+int main()
+{
+	LinkList head;
+
+	return 0;
+}
