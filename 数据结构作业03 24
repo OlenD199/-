@@ -1,0 +1,208 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//定义书本信息
+typedef struct
+{
+	int num;//书籍编号
+	char name[20];//书名
+	float price;//书价
+}Book_inf;
+
+//定义结构体
+typedef struct Book
+{
+	Book_inf datas;
+	struct Book* next;
+}Book,*BookList;
+
+int menu();
+int Init_List(BookList* head);
+void Import_Book(BookList head, int max_size);
+void Insert_List(BookList head, int pos);
+void Delete_List(BookList head, int pos);
+void Show_List(BookList head);
+void Find_List(BookList head, int pos);
+void Destory_List(BookList* head);
+
+int main()
+{
+	BookList head;
+	Init_List(&head);
+	int ret = 1;
+	int amount;
+	int pos;
+	while (ret)
+	{
+		ret = menu();
+		switch (ret)
+		{
+		case 1:
+			printf("请输入将要输入的图书数量：>\t");
+			scanf("%d", &amount);
+			Import_Book(head, amount);
+			break;
+		case 2:
+			printf("请输入插入的位置：>\t");
+			scanf("%d", &pos);
+			Insert_List(head, pos);
+			break;
+		case 3:
+			printf("请输入要删除的位置：>\t");
+			scanf("%d", &pos);
+			Delete_List(head, pos);
+			break;
+		case 4:
+			Show_List(head);
+			break;
+		case 5:
+			printf("请输入要查看的位置：>\t");
+			scanf("%d", &pos);
+			Find_List(head, pos);
+			break;
+		case 0:
+			printf("已退出管理系统\n");
+			break;
+		default:
+			printf("输入数字错误！\n");
+			break;
+		}
+	}
+	Destory_List(&head);
+
+	return 0;
+}
+
+//创建链表
+int Init_List(BookList* head)
+{
+	*head = (BookList)malloc(sizeof(Book));
+	if ((*head) == NULL)
+		return -1;
+	(*head)->next = NULL;
+	return 1;
+}
+
+//菜单函数
+int menu()
+{
+	printf("************Welcome  to  library  manage  system***************\n");
+	printf("***********  1.Import book       2.Insert book  ***************\n");
+	printf("***********  3.Delete book       4.Show book    ***************\n");
+	printf("***********  5.Find book         0.exit system  ***************\n");
+	printf("***************************************************************\n");
+	printf("Please input number：>\t");
+	int d;
+	scanf("%d", &d);
+	return d;
+}
+
+//输入函数
+void Import_Book(BookList head, int max_size)
+{
+	BookList q, p;
+	p = head;
+	for (int i = 0; i < max_size; i++)
+	{
+		q = (BookList)malloc(sizeof(Book));
+		printf("请输入图书信息：\n");
+		if (q)
+		{
+			scanf("%d%s%f", &q->datas.num, q->datas.name, &q->datas.price);
+			q->next = NULL;//注意给指针赋值为NULL，防止野指针
+			p->next = q;
+			p = p->next;
+		}
+	}
+}
+
+//插入函数
+void Insert_List(BookList head, int pos)
+{
+	int count = 0;//计数器
+	BookList s, p = head;
+	while (p && count < pos - 1)//找到pos-1
+	{
+		count++;
+		p = p->next;
+	}
+	if (!p || count > pos - 1)
+	{
+		printf("输入位置错误！\n");
+		return;
+	}
+	printf("请输入图书相关信息：\n");
+	s = (BookList)malloc(sizeof(Book));
+	if (s)
+	{
+		scanf("%d%s%f", &s->datas.num, s->datas.name, &s->datas.price);
+		s->next = p->next;
+		p->next = s;
+	}
+	printf("录入成功!\n");
+}
+
+//删除函数
+void Delete_List(BookList head, int pos)
+{
+	int count = 0;
+	BookList q, p = head;
+	while (p->next && count < pos - 1)
+	{
+		count++;
+		p = p->next;
+	}
+	if (!p->next || count > pos - 1)
+	{
+		printf("输入位置错误！\n");
+		return;
+	}
+	q = p->next;
+	p->next = q->next;
+	free(q);
+	printf("删除成功!\n");
+}
+
+//输出函数
+void Show_List(BookList head)
+{
+	BookList q = head->next;
+	printf("书籍编号\t书名\t书价\n");
+	while (q)
+	{
+		printf("%d\t\t%s\t%.2f\n", q->datas.num, q->datas.name, q->datas.price);
+		q = q->next;
+	}
+}
+
+//查找函数
+void Find_List(BookList head, int pos)
+{
+	BookList p = head->next;
+	int count = 1;
+	while (p && count < pos)
+	{
+		count++;
+		p = p->next;
+	}
+	if (!p || count > pos)
+	{
+		printf("输入位置错误！\n");
+		return;
+	}
+	printf("书籍编号\t书名\t书价\n");
+	printf("%d\t\t%s\t%.2f\n", p->datas.num, p->datas.name, p->datas.price);
+}
+
+//清空链表
+void Destory_List(BookList* head)
+{
+	BookList p = *head;
+	while (p)
+	{
+		(*head) = (*head)->next;
+		free(p);
+		p = *head;
+	}
+}
