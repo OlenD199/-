@@ -1,0 +1,361 @@
+//顺序表
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct
+{
+	int* data;//动态定义数组
+	int length;//当前元素个数
+	int capacity;//结构体容量
+}SqList;
+
+//初始化操作
+int InitSqList(SqList* L, int max)
+{
+	L->data = (SqList*)malloc(sizeof(SqList) * max);
+	if (L->data == NULL)
+	{
+		printf("空间申请失败！\n");
+		return 0;
+	}
+	L->capacity = max;
+	L->length = 0;
+	return 1;
+}
+
+//插入操作
+int InsertSqList(SqList* L, int i, int x)//i表示位置，x表示要插入的值
+{
+	if (L->data == NULL)
+	{
+		return 0;
+	}
+	//1.判断i的值是否合法
+	if (i <= 0 || i > L->capacity)
+	{
+		printf("插入位置异常！\n");
+		return 0;
+	}
+	//2.判断结构体内存是否足够
+	if (L->length == L->capacity)
+	{
+		printf("容量不够！\n");
+		return 0;
+	}
+	//3.进行插入操作
+	for (int k = L->length; k >= i; k--)
+	{
+		L->data[k] = L->data[k - 1];
+	}
+	L->data[i - 1] = x;//数组是以0为首位的，而位序以1为首位
+	L->length++;
+	return 1;
+}
+
+//删除操作
+int DeleteSqList(SqList* L, int i, int* x)//i表示要删除的位置，x表示该位置的元素，需要返回该值
+{
+	if (L->data == NULL)
+	{
+		return 0;
+	}
+	//1.判断结构体中是否有元素
+	if (0 == L->length)
+	{
+		printf("没有元素，不能删除！\n");
+		return 0;
+	}
+	//2.判断i的合法性
+	if (i <= 0 || i > L->length)
+	{
+		printf("位置异常！\n");
+		return 0;
+	}
+	//3.进行删除操作
+	*x = L->data[i - 1];
+	for (int j = i - 1; j < L->length - 1; j++)
+	{
+		L->data[j] = L->data[j + 1];
+	}
+	L->length--;
+
+	return 1;
+}
+
+//更新操作
+int UpdateSqList(SqList* L, int i, int x)//i表示位置，x表示该位置需要更新的元素
+{
+	if (L->data == NULL)
+	{
+		return 0;
+	}
+	//1.判断结构体中是否有元素
+	if (L->length == 0)
+	{
+		printf("没有元素，不能更新！\n");
+		return 0;
+	}
+	//2.判断位置i的合法性
+	if (i <= 0 || i > L->length)
+	{
+		printf("位置不合理！\n");
+		return 0;
+	}
+	//3.进行更新操作
+	L->data[i - 1] = x;
+
+	return 1;
+}
+
+//获取操作
+int GetSqList(SqList* L, int i, int* x)//i表示位置，x获得该位置的值
+{
+	if (L->data == NULL)
+	{
+		return 0;
+	}
+	//1.判断结构体中是否有元素
+	if (0 == L->length)
+	{
+		printf("没有元素，不能获取！\n");
+		return 0;
+	}
+	//2.判断位置的合法性
+	if (i <= 0 || i > L->length)
+	{
+		printf("位置错误！\n");
+		return 0;
+	}
+	//3.获取操作
+	*x = L->data[i - 1];
+
+	return 1;
+}
+
+//定位操作 以查找学生姓名为例 （根据给定的条件，得到相应的元素的位置）
+//int LocateSqList(SqList* L, char* x)//x可以看成是数组
+//{
+//	int i;
+//	if (0 == L->length)
+//	{
+//		printf("没有元素，不能获取！\n");
+//		return 0;
+//	}
+//	for (i = 0; i < L->length; i++)
+//	{
+//		if (strcmp(L->data.name, x) == 0)
+//			return 1 + i;
+//	}
+//	return 0;
+//}
+
+//遍历操作（显示所有数据）
+int DisSqList(SqList L)//输出函数不需要改变结构体中的数据，不用传地址
+{
+	if (L.data == NULL)
+	{
+		return 0;
+	}
+	//1.判断结构体中是否有元素
+	if (0 == L.length)
+	{
+		printf("没有元素，不能获取！\n");
+		return 0;
+	}
+	//2.进行输出操作
+	for (int i = 0; i < L.length; i++)
+	{
+		printf("%d ", L.data[i]);
+	}
+	printf("%d", L.capacity);
+	printf("%d", L.length);
+}
+
+int main()
+{
+	return 0;
+}
+
+
+
+
+
+//单链表
+
+//#include <stdio.h>
+//#include <string.h>
+//#include <stdlib.h>
+//
+//typedef struct Node
+//{
+//	int data;//数据域
+//	struct Node* next;//指针域
+//}LNode, * LinkList;
+//
+////初始化操作
+//int InitLinList(LinkList* L)//该操作需要改变头结点，所以有*
+//{
+//	//L是指向头指针的指针变量，(*L)是头指针，申请头结点空间，将头结点地址给头地址
+//	*L = (LinkList)malloc(sizeof(LNode));
+//	if (*L == NULL)
+//	{
+//		return 0;
+//	}
+//	(*L)->next = NULL;
+//
+//	return 1;
+//}
+//
+////插入操作
+//int InsertLinkList(LinkList L, int i, int x)//i表示要插入的位置，x表示要插入的值
+//{
+//	LinkList p = L, s;//p指向头结点
+//	int pos;//计数器，记住p指向头节点的位置
+//	//让p记住i-1个结点，pos记住p指向结点的位置
+//	while (p != NULL && pos < i - 1)//找到第i-1个位置（可以记作：因为找的是第i-1个位置，所以是p!=NULL）
+//	{
+//		pos++;
+//		p = p->next;
+//	}
+//	//如果i过大，会出现p==NULL（防止i的值大于表长）；如果i过小，会出现pos>i-1(防止pos小于等于0)
+//	if (p == NULL || pos > i - 1)
+//	{
+//		printf("插入位置不合理！\n");
+//		return 0;
+//	}
+//	s = (LinkList)malloc(sizeof(LNode));//动态申请新结点
+//	s->next = p->next;
+//	p->next = s;
+//	p->data = x;
+//
+//	return 1;
+//}
+//
+////删除操作
+//int DeleteLinkList(LinkList L, int i, int* x)//i表示需要删除的位置，x表示该位置的数据
+//{
+//	
+//	LinkList q, p = L;//p指向头结点
+//	int pos = 0;//计数器，寻找i的位置
+//	//让p记住第i-1个结点，pos指向结点的位置
+//	while (p->next != NULL && pos < i - 1)//p为i-1位置的总数据，p-<next为i位置的数据，
+//										  //因为要删除它，所以要保证i位置不能为空，而插入可以插入到表的最后，所以为p！=NULL
+//	{
+//		pos++;
+//		p = p->next;
+//	}
+//	/*如果i过大或链表为空（i大于表长）出现p->next==NULL;如果i过小（为0或为负数），则出现pos>i-1*/
+//	if (p->next == NULL || pos > i - 1)
+//	{
+//		printf("链表为空或删除位置不合理！\n");
+//		return 0;
+//	}
+//	//删除操作
+//	q = p->next;
+//	p->next = q->next;
+//	*x = q->data;
+//	free(q);
+//
+//	return 1;
+//}
+//
+////更新操作
+//int UpdateLinkList(LinkList L, int i, int x)
+//{
+//	LinkList p = L->next;//p指向第一个结点
+//	int n = 1;//计数器(因为前面p = L->next,所以n这里初始化为1)
+//	while (p && n<i)//寻找到i的位置
+//	{
+//		n++;
+//		p = p->next;
+//	}
+//	if (p == NULL || n > i)
+//	{
+//		printf("位置不合理，不能更新！\n");
+//		return 0;
+//	}
+//	p->data = x;
+//
+//	return 1;
+//}
+//
+////获取操作（得到位置i的数据元素）
+//int GetLinkList(LinkList L, int i, int* x)
+//{
+//	LinkList p = L->next;
+//	int count = 1;
+//	while (p && count < i)//寻找到i的位置
+//	{
+//		p = p->next;
+//		count++;
+//	}
+//	if (p == NULL || count < i)
+//	{
+//		printf("位置不合理，不能获取！\n");
+//		return 0;
+//	}
+//	*x = p->data;
+//
+//	return 1;
+//
+//}
+//
+////定位操作
+////int LocationLinkList(LinkList L, char* name)//以name为例
+////{
+////	LinkList p = L->next;
+////	int j = 1;
+////	while (p)
+////	{
+////		if (strcmp(p->data.name, name))
+////		{
+////			j++;
+////			p = p->next;
+////		}
+////		else
+////			return j;
+////	}
+////	if (p == NULL)
+////		return 0;
+////}
+//
+////求长度操作
+//int LengthLinkList(LinkList L)
+//{
+//	LinkList p = L->next;
+//	int count = 0;
+//	while (p)
+//	{
+//		count++;
+//		p = p->next;
+//	}
+//	return count;
+//}
+//
+////遍历操作
+//int DisLinkList(LinkList L)
+//{
+//	LinkList p = L->next;//指向第一个结点，即第一个数据
+//	if (p == NULL)
+//	{
+//		printf("没有数据！\n");
+//		return 0;
+//	}
+//	while (p)
+//	{
+//		printf("%d ", p->data);
+//		p = p->next;
+//	}
+//}
+//
+//int main()
+//{
+//	LinkList head;
+//
+//
+//	return 0;
+//}
+
+ 
