@@ -1,0 +1,42 @@
+//头插法（以输入学生信息为例）
+void frontLinkList(LinkList* L)//头插法需要在头结点的指针域处理，所以有*
+{
+	LinkList p;
+	STD x;
+	char yn;
+	do
+	{
+		printf("请输入第%d个同学的相关信息：");
+		scanf("%s%d", x.name, x.score);
+		getchar();
+		p = (LinkList)malloc(sizeof(LNode));
+		p->data = x;
+		//尾插操作
+		p->next = (*L)->next;
+		(*L)->next = p;
+		printf("请输入是否需要再次操作：Y/N\n");
+		yn = getchar();
+	} while (yn == 'Y');
+}
+
+//尾插法（以输入学生信息为例）
+void rearcreateLinkList(LinkList* L)
+{
+	LinkList R, p;//R表示每次输入的最后一个结点
+	STD x;
+	char yn;
+	R = (*L);//最初没有数据，所以为头结点
+	do
+	{
+		printf("请输入第%d个同学的相关信息：");
+		scanf("%s%d", x.name, x.score);
+		getchar();
+		p = (LinkList)malloc(sizeof(LNode));
+		p->data = x;
+		p->next = NULL;
+		R->next = p;
+		R = p;
+		printf("请输入是否需要再次操作：Y/N\n");
+		yn = getchar();
+	} while (yn == 'Y');
+}
