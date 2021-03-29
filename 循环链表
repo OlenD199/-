@@ -1,0 +1,175 @@
+////单向循环链表（带头指针的单向循环链表）
+//#include <stdio.h>
+//#include <stdlib.h>
+//
+////定义结构体
+//typedef struct Node
+//{
+//	int data;
+//	struct Node* next;
+//}LNode,*LinkList;
+//
+////初始化
+//int InitCirLinkList(LinkList* L)
+//{
+//	*L = (LinkList)malloc(sizeof(LNode));
+//	if (*L == NULL)
+//		return 0;
+//	(*L)->next = *L;//循环空表头指针指向自己
+//	return 1;
+//}
+//
+////插入操作
+//int InsertCirLinkList(LinkList L, int i, int elem)
+//{
+//	LinkList p = L;
+//	int pos = 0;
+//	while (p->next != L && pos < i - 1)//找到i-1个位置
+//	{
+//		pos++;
+//		p = p->next;
+//	}
+//	if (p->next == L && pos<i - 1 || pos>i - 1)//p->next == L && pos<i - 1用于判断i大于表长+1
+//	{
+//		printf("位置异常！\n");
+//		return 0;
+//	}
+//	LinkList s = (LinkList)malloc(sizeof(LNode));
+//	s->data = elem;
+//	s->next == p->next;
+//	p->next = s;
+//	return 1;
+//}
+//
+////删除操作
+//int DeleteCirLinkList(LinkList L, int i, int* elem)
+//{
+//	LinkList p = L,q;
+//	int pos = 0;
+//	while (p->next != L && pos < i - 1)//找到i-1个位置
+//	{
+//		pos++;
+//		p = p->next;
+//	}
+//	if (p->next == L || pos>i - 1)//p->next == L 用于判断i大于表长
+//	{
+//		printf("位置异常！\n");
+//		return 0;
+//	}
+//	*elem = p->data;
+//	q = p->next;
+//	p->next = q->next;
+//	free(q);
+//	return 1;
+//}
+//
+//int main()
+//{
+//
+//	return 0;
+//}
+
+//双向循环链表
+
+#include <stdio.h>
+#include <stdlib.h>
+
+//定义结构体
+typedef struct Dnode
+{
+	int data;
+	struct Dnode* pre;
+	struct Dnode* next;
+}Dnode,*DLinkList;
+
+//初始化操作
+int InitDLinkList(DLinkList* L)
+{
+	*L = (DLinkList)malloc(sizeof(Dnode));
+	if (*L == NULL)
+	{
+		return 0;
+	}
+	(*L)->pre = (*L)->next = (*L);//前指针和后指针都指向头结点
+	return 1;
+}
+
+//插入操作
+int InsertDLinkList(DLinkList L, int i, int elem)
+{
+	DLinkList p = L, q;
+	int pos = 0;
+	while (p->next != L && pos < i - 1)
+	{
+		pos++;
+		p = p->next;
+	}
+	if (p->next == L && pos < i - 1 || pos > i - 1)
+	{
+		printf("插入位置不合理！\n");
+		return 0;
+	}
+	q = (DLinkList)malloc(sizeof(Dnode));
+	q->data = elem;
+	q->pre = p;
+	q->next = p->next;
+	p->next->pre = q;
+	p->next = q;
+	return 1;
+}
+
+//删除操作
+int DeleteDLinkList(DLinkList L, int i, int* elem)
+{
+	DLinkList p = L, q;
+	int pos = 0;
+	while (p->next != L && pos < i - 1)
+	{
+		pos++;
+		p = p->next;
+	}
+	if (p->next == L && pos<i - 1 || pos>i - 1)
+	{
+		printf("插入位置不合理！\n");
+		return 0;
+	}
+	*elem = q->data;
+	q = p->next;
+	p->next = q->next;
+	q->next->pre = p;
+	free(q);
+
+	return 1;
+}
+
+//遍历操作
+void DisDLinkList(DLinkList L, int n)//传入n为1或2，如果为1，则从前到后，如果为2，则为从后到前
+{
+	DLinkList p;
+	if (1 == n)
+	{
+		p = L->next;
+		while (p != L)
+		{
+			printf(p->data);
+			p = p->next;
+		}
+		printf("\n");
+	}
+	if (2 == n)
+	{
+		p = L->pre;
+		while (p != L)
+		{
+			printf(p->data);
+			p = p->pre;
+		}
+		printf("\n");
+	}
+}
+
+int main()
+{
+	return 0;
+}
+
