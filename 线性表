@@ -1,0 +1,338 @@
+/*
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct 
+{
+	int num;
+	char name[20];
+	float price;
+}Book;
+
+typedef struct Node
+{
+	Book data;
+	struct Node* next;
+}Node,*LinkList;
+
+//初始化
+int InitLinkList(LinkList* L)
+{
+	(*L)=(LinkList)malloc(sizeof(Node));
+	if(*L==NULL)
+	{
+		return 0;
+	}
+	(*L)->next = NULL;
+	return 1;
+}
+
+//主菜单
+void menu()
+{
+	printf("1.Insert\t\t2.Delete\n");
+	printf("3.Print\t\t\t4.Getelem\n");
+	printf("5.Getnum\t\t0.Exit\n");
+}
+
+//插入函数
+int InsertLinkList(LinkList L,int i)
+{
+	LinkList p=L,q;
+	int pos=0;
+	while(p!=NULL&&pos<i-1)
+	{
+		pos++;
+		p=p->next;
+	}
+	if(p==NULL||pos>i-1)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	q=(LinkList)malloc(sizeof(Node));
+	printf("please input the information：\n");
+	scanf("%d%s%f",&q->data.num,q->data.name,&q->data.price);
+	q->next=p->next;
+	p->next=q;
+
+	return 1;
+}
+
+//删除函数
+int DeleteLinkList(LinkList L,int i)
+{
+	LinkList p=L,q;
+	int pos=0;
+	while(p->next!=NULL&&pos<i-1)
+	{
+		p=p->next;
+		pos++;
+	}
+	if(p->next==NULL||pos>i-1)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	q=p->next;
+	p->next=q->next;
+	free(q);
+
+	return 1;
+}
+
+//打印函数
+int PrintLinkList(LinkList L)
+{
+	LinkList p=L->next;
+	if(p==NULL)
+	{
+		printf("no data,cannot print!\n");
+		return 0;
+	}
+	while(p)
+	{
+		printf("%d\t%s\t%.2f\n",p->data.num,p->data.name,p->data.price);
+		p=p->next;
+	}
+	return 1;
+}
+
+//获取元素函数
+int GetelemLinkList(LinkList L,int i)
+{
+	LinkList p=L->next;
+	int pos=1;
+	while(p&&pos<i)
+	{
+		pos++;
+		p=p->next;
+	}
+	if(p==NULL||pos>i)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	printf("%d\t%s\t%.2f\n",p->data.num,p->data.name,p->data.price);
+	return 1;
+}
+
+//多少本图书
+int GetbooknumLinkList(LinkList L)
+{
+	LinkList p=L->next;
+	int count=0;
+	while(p)
+	{
+		p=p->next;
+		count++;
+	}
+	printf("have %d book\n\n",count);
+	return 1;
+}
+
+int main()
+{
+
+	LinkList L;
+	InitLinkList(&L);
+	int pos=0;
+	int num=1;
+	while(num)
+	{
+		menu();
+		printf("please input the num:>\t");
+		scanf("%d",&num);
+		switch(num)
+		{
+		case 1:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			InsertLinkList(L,pos);
+			break;
+		case 2:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			DeleteLinkList(L,pos);
+			break;
+		case 3:
+			PrintLinkList(L);
+			break;
+		case 4:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			GetelemLinkList(L,pos);
+			break;
+		case 5:
+			GetbooknumLinkList(L);
+			break;
+		case 0:
+			printf("Exit system!\n");
+			break;
+		default :
+			printf("number error,please input number again!\n");
+			break;
+		}
+	}
+
+	return 0;
+}
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAXSIZE 20
+
+typedef struct
+{
+	char name[20];
+	float score;
+}STD;
+
+typedef struct
+{
+	STD *arr;
+	int length;
+	int capacity;
+}SqList;
+
+//初始化
+int InitSqList(SqList* L,int maxsize)
+{
+	L->arr=(STD*)malloc(sizeof(STD));
+	if(L->arr==NULL)
+	{
+		return 0;
+	}
+	L->capacity=maxsize;
+	L->length=0;
+	return 1;
+}
+
+//菜单函数
+void menu()
+{
+	printf("1.Insert\t\t2.Delete\n3.Print\t\t\t4.Getelem\n0.Exit\n");
+}
+
+//插入函数
+int InsertSqList(SqList* L,int i)
+{
+	if(L->length==L->capacity)
+	{
+		printf("No room!");
+		return 0;
+	}
+	if(i<=0||i>L->length+1)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	for(int j=L->length;j>=i;j--)
+	{
+		L->arr[j]=L->arr[j-1];
+	}
+	printf("please input information:\n");
+	scanf("%f%s",&L->arr[i-1].score,L->arr[i-1].name);
+	L->length++;
+	return 1;
+}
+
+//删除函数
+int DeleteSqList(SqList* L,int i)
+{
+	if(0==L->length)
+	{
+		printf("no data,cannot delete!\n");
+		return 0;
+	}
+	if(i<=0||i>L->length)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	for(int j=i-1;j<L->length-1;j++)
+	{
+		L->arr[j]=L->arr[j+1];
+	}
+	L->length--;
+	return 1;
+}
+
+//打印函数
+int PrintSqList(SqList L)
+{
+	if(0==L.length)
+	{
+		printf("no data,cannot print!\n");
+		return 0;
+	}
+	for(int j=0;j<L.length;j++)
+	{
+		printf("%s\t%.2f\n",L.arr[j].name,L.arr[j].score);
+	}
+	return 1;
+}
+
+//得到数据
+int GetemlemSqList(SqList L,int i)
+{
+	if(0==L.length)
+	{
+		printf("no data,cannot print!\n");
+		return 0;
+	}
+	if(i<=0||i>L.length)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	printf("%s\t%.2f\n",L.arr[i-1].name,L.arr[i-1].score);
+	return 1;
+}
+
+
+int main()
+{
+	SqList L;
+	InitSqList(&L,MAXSIZE);
+	int num=1;
+	int pos;
+	while(num)
+	{
+		menu();
+		printf("please input the num:>\t");
+		scanf("%d",&num);
+		switch(num)
+		{
+		case 1:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			InsertSqList(&L,pos);
+			break;
+		case 2:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			DeleteSqList(&L,pos);
+			break;
+		case 3:
+			PrintSqList(L);
+			break;
+		case 4:
+			printf("please input the position:>\t");
+			scanf("%d",&pos);
+			GetemlemSqList(L,pos);
+			break;
+		case 0:
+			printf("Exit system!\n");
+			break;
+		default:
+			printf("num erroe,please input num again!\n");
+			break;
+		}
+	}
+	return 0;
+}
