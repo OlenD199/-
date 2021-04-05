@@ -1,0 +1,666 @@
+////线性表
+//
+//#include <stdio.h>
+//#include <string.h>
+//#include <stdlib.h>
+//
+//#define MAXSIZE 20
+//
+//typedef struct
+//{
+//	int num;
+//	char name[20];
+//	float price;
+//}Book;
+//
+//typedef struct
+//{
+//	Book* arr;
+//	int length;
+//	int capacity;
+//}SqList;
+//
+//void menu()
+//{
+//	printf("1.Insert\t\t2.Delete\n");
+//	printf("3.Print\t\t\t4.Getelem\n");
+//	printf("0.Exit\n");
+//}
+//
+//int InitSqList(SqList* L,int max)
+//{
+//	(*L).arr = (Book*)malloc(sizeof(Book) * max);
+//	if ((*L).arr == NULL)
+//	{
+//		printf("Meory allocation failure!\n");
+//		return 0;
+//	}
+//	(*L).capacity = max;
+//	(*L).length = 0;
+//	return 1;
+//}
+//
+//int InsertSqList(SqList* L, int pos)
+//{
+//	if (L->capacity == L->length)
+//	{
+//		printf("No room,cannot insert!\n");
+//		return 0;
+//	}
+//	if (pos <= 0 || pos > L->length + 1)
+//	{
+//		printf("Position error!\n");
+//		return 0;
+//	}
+//	for (int i = L->length; i >= pos; i--)
+//	{
+//		L->arr[i] = L->arr[i - 1];
+//	}
+//	printf("please input information:\n");
+//	scanf("%d%s%f", &L->arr[pos - 1].num, L->arr[pos - 1].name, &L->arr[pos - 1].price);
+//	L->length++;
+//	return 1;
+//}
+//
+//int DeleteSqList(SqList* L, int pos)
+//{
+//	if (pos <= 0 || pos > L->length)
+//	{
+//		printf("Position error!\n");
+//		return 0;
+//	}
+//	for (int i = pos; i < L->length; i++)
+//	{
+//		L->arr[i - 1] = L->arr[i];
+//	}
+//	L->length--;
+//	return 1;
+//}
+//
+//int PrintSqList(SqList L)
+//{
+//	if (L.length == 0)
+//	{
+//		printf("No data,connot print!\n");
+//		return 0;
+//	}
+//	for (int i = 0; i < L.length; i++)
+//	{
+//		printf("%d\t\t%s\t%.2f\n", L.arr[i].num, L.arr[i].name, L.arr[i].price);
+//	}
+//	return 1;
+//}
+//
+//int GetelemSqList(SqList L, int pos)
+//{
+//	if (L.length == 0)
+//	{
+//		printf("No data,connot print!\n");
+//		return 0;
+//	}
+//	if (pos <= 0 || pos > L.length)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	printf("%d\t\t%s\t%.2f\n", L.arr[pos-1].num, L.arr[pos-1].name, L.arr[pos-1].price);
+//	return 1;
+//}
+//
+//
+//int main()
+//{
+//	SqList L;
+//	InitSqList(&L,MAXSIZE);
+//	int num = 1;
+//	int pos = 0;
+//	while (num)
+//	{
+//		menu();
+//		printf("please input the number:\t");
+//		scanf("%d", &num);
+//		switch (num)
+//		{
+//		case 1:
+//			printf("please input the position:\t");
+//			scanf("%d", &pos);
+//			InsertSqList(&L, pos);
+//			break;
+//		case 2:
+//			printf("please input the position:\t");
+//			scanf("%d", &pos);
+//			DeleteSqList(&L, pos);
+//			break;
+//		case 3:
+//			PrintSqList(L);
+//			break;
+//		case 4:
+//			printf("please input the position:\t");
+//			scanf("%d", &pos);
+//			GetelemSqList(L, pos);
+//			break;
+//		case 0:
+//			printf("Exit system!\n");
+//			break; 
+//		default:
+//			printf("number error,please input again!\n");
+//			break;
+//		}
+//	}
+//	free(L.arr);
+//	return 0;
+//}
+
+
+//单链表
+//#include <stdio.h>
+//#include <string.h>
+//#include <stdlib.h>
+//
+//typedef struct
+//{
+//	int num;
+//	char name[20];
+//	float price;
+//}Book;
+//
+//typedef struct Node
+//{
+//	Book data;
+//	struct Node* next;
+//}Node,*LinkList;
+//
+//int InitLinkList(LinkList* L)
+//{
+//	*L = (LinkList)malloc(sizeof(Node));
+//	if ((*L) == NULL)
+//	{
+//		printf("内存分配失败！\n");
+//		return 0;
+//	}
+//	(*L)->next = NULL;
+//	return 1;
+//}
+//
+//int InsertLinkList(LinkList L, int pos)
+//{
+//	LinkList p = L, q;
+//	int count = 0;
+//	while (p != NULL && count < pos - 1)
+//	{
+//		p = p->next;
+//		count++;
+//	}
+//	if (p == NULL || count > pos - 1)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	q = (LinkList)malloc(sizeof(Node));
+//	printf("please input information:\n");
+//	scanf("%d%s%f", &q->data.num, q->data.name, &q->data.price);
+//	q->next = p->next;
+//	p->next = q;
+//	return 1;
+//}
+//
+//int DeleteLinkList(LinkList L, int pos)
+//{
+//	LinkList p = L, q;
+//	int count = 0;
+//	while (p->next != NULL && count < pos - 1)
+//	{
+//		count++;
+//		p = p->next;
+//	}
+//	if (p->next == NULL || count > pos - 1)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	q = p->next;
+//	p->next = q->next;
+//	free(q);
+//	return 1;
+//}
+//
+//int PrintLinkList(LinkList L)
+//{
+//	LinkList p = L->next;
+//	if (p == NULL)
+//	{
+//		printf("No data,connot print!\n");
+//		return 0;
+//	}
+//	while (p)
+//	{
+//		printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);
+//		p = p->next;
+//	}
+//	return 1;
+//}
+//
+//int GetelemLinkList(LinkList L, int pos)
+//{
+//	LinkList p = L->next;
+//	int count = 1;
+//	while (p != NULL && count < pos)
+//	{
+//		p = p->next;
+//		count++;
+//	}
+//	if (p == NULL || count > pos)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);
+//	return 1;
+//}
+//
+//void menu()
+//{
+//	printf("1.Insert\t\t2.Delete\n");
+//	printf("3.Print\t\t\t4.Getelem\n");
+//	printf("0.Exit\n");
+//}
+//
+//int DestoryLinkList(LinkList* L)
+//{
+//	LinkList p = *L;
+//	while (p)
+//	{
+//		(*L) = (*L)->next;
+//		free(p);
+//		p = *L;
+//
+//	}
+//	return 1;
+//}
+//
+//int ClearLinkList(LinkList* L)
+//{
+//	LinkList p;
+//	while ((*L)->next)
+//	{
+//		p = (*L)->next;
+//		(*L)->next = p->next;
+//		free(p);
+//	}
+//}
+//
+//
+//int main()
+//{
+//	LinkList L;
+//	InitLinkList(&L);
+//	int num = 1;
+//	int pos;
+//	while (num)
+//	{
+//		menu();
+//		printf("please input the number:\t");
+//		scanf("%d", &num);
+//		switch (num)
+//		{
+//		case 1:
+//			printf("please input the pos:\t");
+//			scanf("%d", &pos);
+//			InsertLinkList(L, pos);
+//			break;
+//		case 2:
+//			printf("please input the pos:\t");
+//			scanf("%d", &pos);
+//			DeleteLinkList(L, pos);
+//			break;
+//		case 3:
+//			PrintLinkList(L);
+//			break;
+//		case 4:
+//			printf("please input the pos:\t");
+//			scanf("%d", &pos);
+//			GetelemLinkList(L, pos);
+//			break;
+//		case 0:
+//			printf("Exit system!\n");
+//			break;
+//		default:
+//			printf("number error,please input again!\n");
+//			break;
+//		}
+//	}
+//	DestoryLinkList(&L);
+//
+//	return 0;
+//}
+
+//单向循环链表
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+//
+//typedef struct
+//{
+//	int num;
+//	char name[20];
+//	float price;
+//}Book;
+//
+//typedef struct Node
+//{
+//	Book data;
+//	struct Node* next;
+//}Node,*LinkList;
+//
+//int InitLinkList(LinkList* L)
+//{
+//	(*L) = (LinkList)malloc(sizeof(Node));
+//	if ((*L) == NULL)
+//	{
+//		return 0;
+//	}
+//	(*L)->next = (*L);
+//	return 1;
+//}
+//
+//void menu()
+//{
+//	printf("1.Insert\t\t2.Delete\n");
+//	printf("3.Print\t\t\t4.Getelem\n");
+//	printf("0.Exit\n");
+//}
+//
+//int InsertLinkList(LinkList L, int pos)
+//{
+//	LinkList q,p = L;
+//	int count = 0;
+//	while (p->next != L && count < pos - 1)
+//	{
+//		count++;
+//		p = p->next;
+//	}
+//	if (p->next == L && count < pos - 1 || count > pos - 1)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	q = (LinkList)malloc(sizeof(Node));
+//	printf("please input the information:\n");
+//	scanf("%d%s%f", &q->data.num, q->data.name, &q->data.price);
+//	q->next = p->next;
+//	p->next = q;
+//	return 1;
+//}
+//
+//int DeleteLinkList(LinkList L, int pos)
+//{
+//	LinkList q, p = L;
+//	int count = 0;
+//	while (p->next != L && count < pos - 1)
+//	{
+//		p = p->next;
+//		count++;
+//	}
+//	if (p->next == L || count < pos - 1)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	q = p->next;
+//	p->next = q->next;
+//	delete q;
+//	return 1;
+//}
+//
+//int PrintLinkList(LinkList L)
+//{
+//	LinkList p = L->next;
+//	while (p != L)
+//	{
+//		printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);
+//		p = p->next;
+//	}
+//	return 1;
+//}
+//
+//int GetelemLinkList(LinkList L, int pos)
+//{
+//	LinkList p = L->next;
+//	int count = 1;
+//	while (p != L && count < pos)
+//	{
+//		p = p->next;
+//		count++;
+//	}
+//	if (p == L || count > pos)
+//	{
+//		printf("position error!\n");
+//		return 0;
+//	}
+//	printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);
+//	return 1;
+//}
+//
+//int ClearLinkList(LinkList* L)
+//{
+//	LinkList p = (*L);
+//	while (p != *L)
+//	{
+//		(*L)->next = (*L);
+//		free(p);
+//		p = (*L);
+//	}
+//	return 1;
+//}
+//
+//int main()
+//{
+//	LinkList L;
+//	InitLinkList(&L);
+//	int num = 1;
+//	int pos;
+//	while (num)
+//	{
+//		menu();
+//		printf("please input the number:>\t");
+//		scanf("%d", &num);
+//		switch (num)
+//		{
+//		case 1:
+//			printf("please input the position:>\t");
+//			scanf("%d", &pos);
+//			InsertLinkList(L, pos);
+//			break;
+//		case 2:
+//			printf("please input the position:>\t");
+//			scanf("%d", &pos);
+//			DeleteLinkList(L, pos);
+//			break;
+//		case 3:
+//			PrintLinkList(L);
+//			break;
+//		case 4:
+//			printf("please input the position:>\t");
+//			scanf("%d", &pos);
+//			GetelemLinkList(L,pos);
+//			break;
+//		case 0:
+//			printf("Exit system!\n");
+//			break;
+//		default:
+//			printf("number error,please input again!\n");
+//			break;
+//		}
+//	}
+//	ClearLinkList(&L);
+//
+//	return 0;
+//}
+
+//双向循环链表
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct
+{
+	int num;
+	char name[20];
+	float price;
+}Book;
+
+typedef struct Node
+{
+	Book data;
+	struct Node* next;
+	struct Node* pre;
+}Node,*LinkList;
+
+void menu()
+{
+	printf("1.Insert\t\t2.Delete\n");
+	printf("3.Print\t\t\t4.Getelem\n");
+	printf("0.Exit\n");
+}
+
+int InitLinkList(LinkList* L)
+{
+	(*L) = (LinkList)malloc(sizeof(Node));
+	if ((*L) == NULL)
+	{
+		return 0;
+	}
+	(*L)->next = (*L)->pre = *L;
+	return 1;
+}
+
+int InsertLinkList(LinkList L, int pos)
+{
+	LinkList p = L, q;
+	int count = 0;
+	while (p->next != L && count < pos - 1)
+	{
+		count++;
+		p = p->next;
+	}
+	if (p->next == L && count<pos - 1 || count>pos - 1)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	q = (LinkList)malloc(sizeof(Node));
+	printf("please input information:\n");
+	scanf("%d%s%f", &q->data.num, q->data.name, &q->data.price);
+	q->pre = p;
+	q->next = p->next;
+	p->next->pre = q;
+	p->next = q;
+	return 1;
+}
+
+int DeleteLinkList(LinkList L, int pos)
+{
+	LinkList p = L, q;
+	int count = 0;
+	while (p->next != L && count < pos - 1)
+	{
+		count++;
+		p = p->next;
+	}
+	if (p->next == L || count > pos - 1)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	q = p->next;
+	p->next = q->next;
+	q->next->pre = p;
+	free(q);
+	return 1;
+}
+
+int PrintLinkList(LinkList L)
+{
+	LinkList p = L->next;
+	while (p != L)
+	{
+		printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);	
+		p = p->next;
+	}
+	return 1;
+}
+
+int GetelemLinkList(LinkList L, int pos)
+{
+	LinkList p = L->next;
+	int count = 1;
+	while (p != L && count < pos)
+	{
+		p = p->next;
+		count++;
+	}
+	if (p == L || count > pos)
+	{
+		printf("position error!\n");
+		return 0;
+	}
+	printf("%d\t\t%s\t%.2f\n", p->data.num, p->data.name, p->data.price);
+	return 1;
+}
+
+int ClearLinkList(LinkList* L)
+{
+	LinkList p = (*L);
+	while (p != *L)
+	{
+		(*L) = (*L)->next;
+		free(p);
+		p = (*L);
+	}
+	return 1;
+}
+
+int main()
+{
+	LinkList L;
+	InitLinkList(&L);
+	int num = 1;
+	int pos;
+	while (num)
+	{
+		menu();
+		printf("please input the number:>\t");
+		scanf("%d", &num);
+		switch (num)
+		{
+		case 1:
+			printf("please input the position:>\t");
+			scanf("%d", &pos);
+			InsertLinkList(L, pos);
+			break;
+		case 2:
+			printf("please input the position:>\t");
+			scanf("%d", &pos);
+			DeleteLinkList(L, pos);
+			break;
+		case 3:
+			PrintLinkList(L);
+			break;
+		case 4:
+			printf("please input the position:>\t");
+			scanf("%d", &pos);
+			GetelemLinkList(L,pos);
+			break;
+		case 0:
+			printf("Exit system!\n");
+			break;
+		default:
+			printf("number error,please input again!\n");
+			break;
+		}
+	}
+	ClearLinkList(&L);
+
+	return 0;
+}
