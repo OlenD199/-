@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node
+{
+	int data;
+	struct next* next;
+}Node,*LinkList;
+
+int InitLinkList(LinkList* L)
+{
+	*L = (LinkList)malloc(sizeof(Node));
+	if (*L == NULL)
+	{
+		return 0;
+	}
+	(*L)->next = NULL;
+	LinkList p , q;
+	p = (*L);
+	for (int i = 0; i < 3; i++)
+	{
+		q = (LinkList)malloc(sizeof(Node));
+		scanf("%d", &q->data);
+		q->next = NULL;
+		p->next = q;
+		p = q;
+	}
+	return 1;
+}
+
+int TwoLinkList1(LinkList La, LinkList Lb)//把b线性表导入到a线性表
+{
+	LinkList pa, pb, qa, qb;
+	qa = La;
+	pa = La->next;
+	qb = pb = Lb->next;
+	while (pa && pb)
+	{
+		if (pb->data < pa->data)
+		{
+			qb = qb->next;
+			pb->next = pa;
+			qa->next = pb;
+			pa = qa->next;
+			pb = qb;
+		}
+		else
+		{
+			qa = pa;
+			pa = pa->next;
+		}
+	}
+	if (pb)
+	{
+		qa->next = pb;
+	}
+	free(Lb);
+	return 1;
+}
+
+int PrintLinkList(LinkList L)
+{
+	LinkList p = L->next;
+	while (p!=NULL)
+	{
+		printf("%d ", p->data);
+		p = p->next;
+	}
+	printf("\n");
+	return 1;
+}
+
+int main()
+{
+	LinkList La, Lb;
+	InitLinkList(&La);
+	InitLinkList(&Lb);
+// 	PrintLinkList(La);
+	TwoLinkList1(La, Lb);
+	PrintLinkList(La);
+	LinkList Lc;
+//	TwoLinkList2(La,Lb,&)
+	return 0;
+}
