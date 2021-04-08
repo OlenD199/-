@@ -1,0 +1,123 @@
+//链栈（没有头结点，直接是第一个元素）
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct snode
+{
+	int data;
+	struct snode* next;
+}Snode,*LinkStack;
+
+//初始化操作
+void InitLinkStack(LinkStack* LS)
+{
+	*LS = NULL;
+}
+
+//判断栈空
+int LinkStackEmpty(LinkStack S)
+{
+	if (S == NULL)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+//得到栈顶
+int LinkStackGetTop(LinkStack S, int* e)
+{
+	if (S == NULL)
+	{
+		return 0;//栈空
+	}
+	*e = S->data;
+	return 1;
+}
+
+//求栈的长度
+int LinkStackLength(LinkStack S)
+{
+	if (S == NULL)
+	{
+		return 0;//栈空
+	}
+	LinkStack p = S;
+	int count = 0;
+	while (p)
+	{
+		count++;
+		p = p->next;
+	}
+	return count;
+}
+
+//进栈
+void LinkStackPush(LinkStack* LS, int e)
+{
+	//此时LS表示目前栈的最后一个元素，要将一个新的元素加入到栈中，然后让LS指向该元素
+	LinkStack p = (LinkStack)malloc(sizeof(Snode));
+	p->data = e;
+	p->next = (*LS);//LS表示目前指向栈顶的指针，*LS表示目前的栈顶元素，然后让p->next指向该栈顶元素，p就变成了新的top
+	*LS = p;//然后让LS这个指针指向新的top，*LS即为新的栈顶元素，LS为指向栈顶的指针
+}
+
+//出栈
+int LinkStackPop(LinkStack* LS, int* e)//因为要判断栈是否为空的情况，所以函数类型为int
+{
+	LinkStack p = *LS;//p表示栈的栈顶元素
+	if (*LS == NULL)
+	{
+		return 0;//栈空
+	}
+	*LS = (*LS)->next;//LS指向下一个元素，将其变为栈顶，（保证LS是指向栈顶元素的指针）
+	*e = p->data;
+	free(p);//释放栈顶元素的空间
+	return 1;
+}
+
+//遍历操作
+int LinkStackTravers(LinkStack S)//需要判断栈是否为空，所以函数类型为int
+{
+	LinkStack p = S;
+	if (S == NULL)
+	{
+		return 0;//栈空
+	}
+	while (p)
+	{
+		printf("%d ", p->data);
+		p = p->next;
+	}
+	printf("\n");
+	return 1;
+}
+
+int main()
+{
+	LinkStack S;//S是一个指针，指向目前栈的最后一个元素
+	InitLinkStack(&S);
+	for (int i = 0; i < 10; i++)
+	{
+		LinkStackPush(&S, i);
+	}
+	int ret = LinkStackEmpty(S);
+	if (1 == ret)
+		printf("栈空\n");
+	else
+		printf("栈不空\n");
+	int num = LinkStackLength(S);
+	printf("目前栈有%d个元素\n", num);
+	int e;
+	LinkStackGetTop(S, &e);
+	printf("%d\n", e);
+	LinkStackTravers(S);
+	for (int i = 0; i < 3; i++)
+	{
+		LinkStackPop(&S, &e);
+		printf("%d\n", e);
+	}
+	LinkStackTravers(S);
+	return 0;
+}
