@@ -1,0 +1,231 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+typedef struct snode//定义一个栈，用于存放算术表达式的后缀式
+{
+	char str;
+	struct snode* next;
+}Snode,*LinkStack;
+
+typedef struct snode_int
+{
+	int data;
+	struct snode_int* next;
+}Snode_int, * LinkStack_int;
+
+//初始化操作
+void InitLinkStack_int(LinkStack_int* LS)
+{
+	*LS = NULL;
+}
+
+//得到栈顶
+int LinkStack_intGetTop(LinkStack_int S, int* e)
+{
+	if (S == NULL)
+	{
+		return 0;//栈空
+	}
+	*e = S->data;
+	return 1;
+}
+
+//进栈
+void LinkStack_intPush(LinkStack_int* LS, int value)
+{
+	//此时LS表示目前栈的最后一个元素，要将一个新的元素加入到栈中，然后让LS指向该元素
+	LinkStack_int p = (LinkStack_int)malloc(sizeof(Snode_int));
+	p->data = value;
+	p->next = (*LS);//LS表示目前指向栈顶的指针，*LS表示目前的栈顶元素，然后让p->next指向该栈顶元素，p就变成了新的top
+	*LS = p;//然后让LS这个指针指向新的top，*LS即为新的栈顶元素，LS为指向栈顶的指针
+}
+
+//出栈
+int LinkStack_intPop(LinkStack_int* LS)//因为要判断栈是否为空的情况，所以函数类型为int
+{
+	LinkStack_int p = *LS;//p表示栈的栈顶元素
+	if (*LS == NULL)
+	{
+		return 0;//栈空
+	}
+	*LS = (*LS)->next;//LS指向下一个元素，将其变为栈顶，（保证LS是指向栈顶元素的指针）
+	int e = p->data;
+	free(p);//释放栈顶元素的空间
+	return e;
+}
+
+//初始化栈
+void InitLinkStack(LinkStack* LS)
+{
+	*LS = NULL;
+}
+
+//得到栈顶元素
+int LinkStackGetTop(LinkStack S, char* e)
+{
+	if (S == NULL)
+		return 0;//栈空
+	*e = S->str;
+	return 1;
+}
+
+//入栈
+void LinkStackPush(LinkStack* LS, char e)
+{
+	LinkStack p = (LinkStack)malloc(sizeof(Snode));
+	p->str = e;
+	p->next = *LS;
+	*LS = p;
+}
+
+//出栈
+int LinkStackPop(LinkStack* LS,char* e)
+{
+	if ((*LS) == NULL)
+		return 0;//栈空
+	LinkStack p = *LS;
+	(*LS) = (*LS)->next;
+	*e = p->str;
+	free(p);
+	return 1;
+}
+
+//判断符号等级
+int Prior(char a)
+{
+	if (a == '*' || a == '/')
+		return 4;
+	else if (a == '+' || a == '-')
+		return 3;
+	else if (a == '(')
+		return 2;
+	else if (a == '#')
+		return 1;
+	else
+		return 0;
+}
+
+//转化为后缀表达式
+void Transformmation(char* ch, char* suff)
+{
+	int k = 0;
+	int i = 0;
+	char s;
+	LinkStack S;
+	InitLinkStack(&S);
+	LinkStackPush(&S, '#');
+	int n = strlen(ch);
+	ch[n] = '#';
+	ch[n + 1] = '\0';
+	while (ch[i] != '\0')
+	{
+		if (ch[i] <= '9' && ch[i] >= '0')
+			suff[k++] = ch[i];
+		else
+		{
+			switch (ch[i])
+			{
+			case '(':
+				LinkStackPush(&S, ch[i]);
+				break;
+			case ')':
+				LinkStackPop(&S, &s);
+				while (s != '(')
+				{
+					suff[k++] = s;
+					LinkStackPop(&S, &s);
+				}
+				break;
+			default:
+				LinkStackGetTop(S, &s);
+				while (Prior(s) >= Prior(ch[i]))
+				{
+					if (s != ch[i])
+					{
+						suff[k++] = s;
+						LinkStackPop(&S, &s);
+						LinkStackGetTop(S, &s);
+					}
+					else
+					{
+						break;
+					}
+				}
+				if (ch[i] != '#')
+					LinkStackPush(&S, ch[i]);
+				break;
+			}
+		}
+	i++;
+	}
+	suff[k] = '\0';
+}
+
+void Suffix_value(char* a)
+{
+	LinkStack_int S;//S是一个指针，指向目前栈的最后一个元素
+	InitLinkStack_int(&S);
+	int i = 0;
+	int x1, x2;
+	while (a[i] != '#')
+	{
+		switch (a[i])
+		{
+		case '+':
+			x2 = LinkStack_intPop(&S);
+			x1 = LinkStack_intPop(&S);
+			LinkStack_intPush(&S, x1 + x2);
+			break;
+		case '-':
+			x2 = LinkStack_intPop(&S);
+			x1 = LinkStack_intPop(&S);
+			LinkStack_intPush(&S, x1 - x2);
+			break;
+		case '*':
+			x2 = LinkStack_intPop(&S);
+			x1 = LinkStack_intPop(&S);
+			LinkStack_intPush(&S, x1 * x2);
+			break;
+		case '/':
+			x2 = LinkStack_intPop(&S);
+			x1 = LinkStack_intPop(&S);
+			if (0 == x2)
+			{
+				printf("除数为0!\n");
+				return;
+			}
+			else
+			{
+				LinkStack_intPush(&S, x1 / x2);
+			}
+			break;
+		case '(':
+
+		default:
+			LinkStack_intPush(&S, a[i] - 48);
+		}
+		i++;
+	}
+	printf("计算结果为  %d\n", LinkStack_intPop(&S));
+}
+
+
+int main()
+{
+	char ch[50] = { 0 };
+	char suff[50] = { 0 };
+	printf("请输入需要计算的数学表达式：>\t");
+	scanf("%s", ch);
+	Transformmation(ch, suff);
+	int n = strlen(suff);
+	suff[n] = '#';
+	suff[n + 1] = '\0';
+	printf("%s", suff);
+	Suffix_value(suff);
+	return 0;
+}
+
+
+
