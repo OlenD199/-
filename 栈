@@ -1,0 +1,186 @@
+//顺序栈
+
+//#include <stdio.h>
+//#include <string.h>
+//#include <stdlib.h>
+//
+//#define MAX 20
+//
+//typedef struct
+//{
+//	int* arr;
+//	int length;//栈的长度
+//	int capacity;//栈的容量
+//}SqStack;
+//
+////初始化
+//int InitSqStack(SqStack* LS, int max)
+//{
+//	(*LS).arr = (SqStack*)malloc(sizeof(SqStack)*max);
+//	if ((*LS).arr == NULL)
+//		return 0;
+//	(*LS).capacity = max;
+//	(*LS).length = -1;
+//	return 1;
+//}
+//
+////判断栈空
+//int SqStackEmpty(SqStack S)
+//{
+//	if (S.length = -1)
+//		return 1;//栈空
+//	return 0;
+//}
+//
+////得到栈顶
+//int SqStackGetTop(SqStack S, int* e)
+//{
+//	if (S.length == -1)
+//		return 0;//栈空
+//	*e = S.arr[S.length];
+//	return 1;
+//}
+////求栈的长度
+//int SqStackLength(SqStack S)
+//{
+//	if (S.length == -1)
+//		return 0;
+//	return S.capacity;
+//}
+//
+////进栈
+//int SqStackPush(SqStack* LS, int value)
+//{
+//	if (LS->capacity == LS->length + 1)
+//		return 0;//栈满
+//	LS->length++;
+//	LS->arr[LS->length] = value;
+//	return 1;
+//}
+//
+////出栈
+//int SqStackPop(SqStack* LS, int* value)
+//{
+//	if (LS->length == -1)
+//		return 0;//栈空
+//	*value = LS->arr[LS->length];
+//	LS->length--;
+//	return 1;
+//}
+//
+////遍历
+//int SqStackTravers(SqStack S)
+//{
+//	if (S.length == -1)
+//		return 0;//栈空
+//	for (int i = 0; i < S.length; i++)
+//	{
+//		printf("%d ", S.arr[S.length]);
+//	}
+//	printf("\n");
+//	return 1;
+//}
+//
+//
+//int main()
+//{
+//
+//	return 0;
+//}
+
+
+//链栈
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct Snode
+{
+	int data;
+	struct Snode* next;
+}Snode,*LinkStack;
+
+//初始化
+void InitLinkStack(LinkStack* LS)
+{
+	*LS == NULL;
+}
+
+//判断栈空
+int LinkStackEmpty(LinkStack S)
+{
+	if (S == NULL)
+		return 1;
+	return 0;
+}
+
+//得到栈顶
+int LinkStackGetTop(LinkStack S, int* e)
+{
+	if (S == NULL)
+		return 0;//栈空
+	*e = S->data;
+	return 1;
+}
+
+//求栈的长度
+int LinkStackLength(LinkStack S)
+{
+	if (S == NULL)
+		return 0;//栈空
+	int k = 0;
+	LinkStack p = S;
+	while (p != NULL)
+	{
+		k++;
+		p = p->next;
+	}
+	return k;
+}
+
+//进栈
+int LinkStackPush(LinkStack* LS, int value)
+{
+	LinkStack p;
+	p = (LinkStack)malloc(sizeof(Snode));
+	p->data = value;
+	p->next = *LS;
+	*LS = p;
+	return 1;
+}
+
+//出栈
+int LinkStackPop(LinkStack* LS, int* value)
+{
+	if (*LS == NULL)
+		return 0;
+	LinkStack p = *LS;
+	(*LS) = (*LS)->next;
+	*value = p->data;
+	free(p);
+	return 1;
+}
+
+//遍历
+int LinkStackTravers(LinkStack S)
+{
+	if (S == NULL)
+		return 0;
+	LinkStack p = S;
+	while (p != NULL)
+	{
+		printf("%d ", p->data);
+		p = p->next;
+	}
+	printf("\n");
+	return 1;
+}
+
+
+int main()
+{
+	LinkStack S;
+	InitLinkStack(&S);
+	return 0;
+}
