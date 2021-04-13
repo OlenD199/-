@@ -1,0 +1,116 @@
+//基于栈的括号匹配
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+
+typedef struct Snode
+{
+	char data;
+	struct Snode* next;
+}Snode,*LinkStack;
+
+//初始化栈
+void InitLinkStack(LinkStack* LS)
+{
+	*LS = NULL;
+}
+
+//进栈
+void LinkStackPush(LinkStack* LS, char e)
+{
+	LinkStack p;
+	p = (LinkStack)malloc(sizeof(Snode));
+	p->data = e;
+	p->next = *LS;
+	*LS = p;
+}
+
+//出栈
+int LinkStackPop(LinkStack* LS, char* value)
+{
+	if (*LS == NULL)
+		return 0;//栈空
+	LinkStack p;
+	p = *LS;
+	(*LS) = (*LS)->next;
+	*value = p->data;
+	free(p);
+	return 1;
+}
+
+//得到栈顶
+int LinkStackGetPop(LinkStack S, char* value)
+{
+	if (S == NULL)
+		return 0;//栈空
+	*value = S->data;
+	return 1;
+}
+
+//括号匹配
+void Matching(char* str)
+{
+	LinkStack S;
+	InitLinkStack(&S);
+	int flag = 1;
+	char e = 0;
+	for (int j = 0; str[j] != '\0' && flag != 0; j++)
+	{
+		if (str[j] != '(' && str[j] != ')' && str[j] != '[' && str[j] != ']' && str[j] != '{' && str[j] != '}')
+			continue;//对非括号字符的处理
+		else
+		{
+			switch (str[j])
+			{
+			case '(':
+			case '[':
+			case '{':
+				LinkStackPush(&S, str[j]);
+				break;
+			case ')':
+				if (S != NULL)
+				{
+					LinkStackPop(&S, &e);
+					if (e != '(')
+						flag = 0;
+				}
+				break;
+			case ']':
+				if (S != NULL)
+				{
+					LinkStackPop(&S, &e);
+					if (e != '[')
+						flag = 0;
+				}
+				break;
+			case '}':
+				if (S != NULL)
+				{
+					LinkStackPop(&S, &e);
+					if (e != '{')
+						flag = 0;
+				}
+				break;
+			}
+		}
+	}
+	if (flag == 1 && S == NULL)
+		printf("吆西，括号匹配！");
+	else
+		printf("括号不匹配！");
+}
+
+
+
+int main()
+{
+	char ch[50] = { 0 };
+	printf("请输入表达式：>\t");
+	scanf("%s", ch);
+	Matching(ch);
+
+	return 0;
+}
