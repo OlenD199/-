@@ -1,0 +1,41 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+void permutation(int per, int end, int* arr)
+{
+    int tmp;
+    if (per + 1 == end)
+    {
+        for (int i = 0; i < end; i++)
+            printf("%d ", arr[i]);
+        printf("\n");
+    }
+    else
+    {
+        for (int i = per; i < end; i++)
+        {
+            tmp = arr[i];
+            arr[i] = arr[per];
+            arr[per] = tmp;
+            permutation(per + 1, end, arr);
+            tmp = arr[i];
+            arr[i] = arr[per];
+            arr[per] = tmp;
+        }
+    }
+}
+
+
+
+int main()
+{
+    int i, a[100], n;
+    scanf("%d", &n);
+    for (i = 0; i < n; i++)
+        a[i] = i + 1;
+    permutation(0, n, a);
+ 
+    return 0;
+}
+
+//以123为例，固定1，进行输出2，3，在固定2，13进行输出，在固定3，输出1，2
