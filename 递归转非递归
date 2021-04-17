@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//1.直接转换法：当递归算法是求值的，不需要回溯，这是只需用变量保存中间结果，将递归结构转换为循环结构
+//a,尾递归：在递归算法中，递归调用语句中有一个，而且在递归算法的最后。例如求n的阶乘
+int fact(int n)
+{
+	if (n == 0 || n == 1)
+		return 1;
+	else
+		return n * fact(n - 1);//递归调用语句中有一个，在递归算法的最后
+}
+
+int fact1(int n)
+{
+	int s = 1, i;
+	for (int i = 1; i <= n; i++)
+	{
+		s = s * n;
+	}
+	return s;
+}
+
+//b，单向递归:在递归算法中有多处递归调用，这些递归调用的参数之间没有任何关系，并且每个递归调用都在递归算法的最后。例如斐波那契数列
+int fibnacci(int n)
+{
+	if (n == 1 || n == 2)
+		return 1;
+	else
+		return fibnacci(n - 1) + fibnacci(n - 2);//这里有两个递归调用，并且他们的参数之间没有关系，调用在算法的最后
+}
+
+int fibnacci1(int n)
+{
+	int f, f1 = 1, f2 = 1;
+	if (n == 1 || n == 2)
+		return 1;
+	else
+		for (int i = 1; i <= n; i++)
+		{
+			f = f1 + f2;
+			f1 = f2;
+			f2 = f;
+		}
+	return f;
+}
+
+//间接转换法：按照递归的执行规律进行转换，将递归调用语句改为进栈操作，
+//将每次递归返回调用处的后续执行语句改为出栈操作。例如：任意一个整数按数字字符显示的递归函数如下：
+
+void change(int x)
+{
+	int n;
+	if (n = x / 10)
+		change(n);//进栈
+	putchar(x % 10 + 48);//出栈
+}
+
+void change(int x)
+{
+	int n;
+	Stack s;
+	InitSatck(s);
+	if (x == 0)
+	{
+		putchar(x + 48);
+		return;
+	}
+	while (x)
+	{
+		push(s, x % 10);//进栈
+		x = x / 10;
+	}
+	while(!Empty(s))//判断栈空
+	{
+		pop(s, n);//出栈
+		change(n + 48);
+	}
+	putchar('\n');
+}
+
+int main()
+{
+	change(123);
+	return 0;
+}
