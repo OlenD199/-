@@ -1,0 +1,289 @@
+//顺序队列
+//#include <stdio.h>
+//#include <string.h>
+//#include <stdlib.h>
+//
+//#define MAXLEN 20
+//
+////结构体定义
+//typedef struct
+//{
+//	int front;//front指向队头元素
+//	int rear;//rear指向队列最后一个元素的后一位置，该位置没有元素
+//	int queueSize;//队列数组的大小
+//	int data[MAXLEN];
+//}SqQueue;
+//
+////初始化操作
+//int InitSqQueue(SqQueue* LQ)
+//{
+//	LQ->front = LQ->rear = 0;//空表列，头指针和尾指针都指向0位置，该位置无元素
+//	LQ->queueSize = MAXLEN;
+//	return 1;
+//}
+//
+////判断队空
+//int SqQueueEmpty(SqQueue Q)
+//{
+//	if (Q.front == Q.rear)
+//		return 1;//队空
+//	else
+//		return 0;
+//}
+//
+////求队列长度
+//int SqQueueLength(SqQueue Q)
+//{
+//	return (Q.rear - Q.front + Q.queueSize) % Q.queueSize;//防止rear小于front
+//}
+//
+////得到队头
+//int SqQueueGetTop(SqQueue Q, int* e)
+//{
+//	//先判断是否队列空
+//	if (SqQueueEmpty(Q) == 1)
+//		return 0;//队列空
+//	*e = Q.data[Q.front];//front指向队列第一个元素，rear只想最后一个元素的下一个位置
+//	return 1;
+//}
+//
+////进队列
+//int SqEnQueue(SqQueue* LQ, int value)//改变结构体有关信息，使用指针
+//{
+//	//首先判断队列是否满了
+//	if ((LQ->rear + 1) % LQ->queueSize == LQ->front)
+//		return 0;//队列满了    使用（rear+1）%queueSize == front 判断队列是否满（不能使用rear+1 == front 判断）；
+//							//使用rear == front 判断队列是否为空
+//	LQ->data[LQ->rear] = value;
+//	LQ->rear = (LQ->rear + 1) % LQ->queueSize;//可能出现rear+1之后大于等于queueSize的情况；
+//	return 1;
+//}
+//
+////出队列
+//int SqDeQueue(SqQueue* LQ, int* e)//改变结构体相关信息，使用指针
+//{
+//	//首先判断队列是否为空
+//	if (LQ->rear == LQ->front)
+//		return 0;//队列空
+//	*e = LQ->data[LQ->front];//出队列从队列头，即front开始出元素
+//	LQ->front = (LQ->front + 1) % LQ->queueSize;//可能出现front + 1大于等于queueSize的情况
+//	return 1;
+//}
+//
+////遍历队列
+//int SqQueueTravers(SqQueue Q)
+//{
+//	int p = Q.front;
+//	while (p != Q.rear)
+//	{
+//		printf("%d ", Q.data[p]);
+//		p = (p + 1) % Q.queueSize;
+//	}
+//	printf("\n");
+//	return 1;
+//}
+//
+//int main()
+//{
+//	SqQueue Q;
+//	int e;
+//	InitSqQueue(&Q);
+//	printf("未入列表时的元素个数：>\t%d\n", SqQueueLength(Q));
+//	printf("判断表是否为空：>\t");
+//	if (SqQueueEmpty(Q) == 1)
+//		printf("表为空\n");
+//	else
+//		printf("表不为空\n");
+//	printf("向队列中输入十个元素后\n");
+//	for (int i = 0; i < 10; i++)//向列表中进入十个元素
+//	{
+//		SqEnQueue(&Q, i);
+//	}
+//	printf("判断表是否为空：>\t");
+//	if (SqQueueEmpty(Q) == 1)
+//		printf("表为空\n");
+//	else
+//		printf("表不为空\n");
+//	printf("入列表后的表长度：>\t%d\n", SqQueueLength(Q));
+//	SqQueueGetTop(Q, &e);
+//	printf("得到表头：>\t%d\n", e);
+//	printf("未出队前遍历操作：\n");
+//	SqQueueTravers(Q);
+//	printf("出列表并输出前面五个元素:\n");
+//	for (int i = 0; i < 5; i++)
+//	{
+//		SqDeQueue(&Q, &e);
+//		printf("%d ", e);
+//	}
+//	printf("\n");
+//	printf("出队后遍历操作：\n");
+//	SqQueueTravers(Q);
+//	printf("判断表是否为空：>\t");
+//	if (SqQueueEmpty(Q) == 1)
+//		printf("表为空\n");
+//	else
+//		printf("表不为空\n");
+//	printf("出列表后的表长度：>\t%d\n", SqQueueLength(Q));
+//	SqQueueGetTop(Q, &e);
+//	printf("得到表头：>\t%d\n", e);
+//	return 0;
+//}
+
+
+//链队列
+
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//栈队列的结点和指向结点的指针数据类型描述
+//队列结点结构体定义：
+typedef struct qnode
+{
+	int data;
+	struct qnode* next;
+}Qnode,*QueueLink;
+//队列指向结点的结构体定义：
+typedef struct
+{
+	QueueLink front;
+	QueueLink rear;
+}QLink;
+
+//初始化操作
+int InitLinkQueue(QLink* LQ)//初始化时处理的是front 和 rear 这两个指针节点的指向，
+							//所以需要改变这两个指针的有关信息，所以一传参数值需要传这两的数据的类型的指针，即QLink*
+{
+	//首先给这两个指针结点动态申请内存
+	LQ->front = LQ->rear = (QueueLink)malloc(sizeof(Qnode));
+					/*这种栈队列的数据结点有一个头结点，其中LQ->front指向该头结点，LQ->rear指向队列的最后一个元素
+					所以可以暂时将LQ->front看作头结点的地址，给其申请内存时要(QueueLink)malloc(sizeof(Qnode));
+					将LQ->rear看成是最后一个数据的地址，给其申请地址时也采用同样的形式*/
+	//再判断申请是否成功
+	if (LQ->front == NULL)
+		return 0;//判断front的同时也有判断rear
+	LQ->front->next = NULL;//将头结点的指针域赋空
+	return 1;
+}
+
+//判断队空
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;//此时Q.front 和 Q.rear都表示头结点
+	return 0;
+}
+
+//求队列长度
+int LinkQueueLenght(QLink Q)
+{
+	//先判断是否为空
+	if (Q.front == Q.rear)
+		return 0;//队空
+	QueueLink p;
+	int count = 0;
+	p = Q.front->next;//while循环条件是p遇到NULL结束，Q.rear表示最后一个元素，最后一步时，p指向了NULL结束循环，所以这里p = Q.front->next ，而不是p = Q.front
+	while (p)
+	{
+		p = p->next;
+		count++;
+	}
+	return count;
+}
+
+//得到队头
+int LinkQueueGetHead(QLink Q,int* e)
+{
+	//判断队空
+	if (Q.front == Q.rear)
+		return 0;//队空
+	*e = Q.front->next->data;//不同的数据类型的赋值方式不同，比如整数和字符串
+	return 1;
+}
+
+//进队列
+int LinkEnQueue(QLink* LQ, int e)//队列只能插到尾部
+{
+	QueueLink p = (QueueLink)malloc(sizeof(Qnode));
+	if (p == NULL)
+		return 0;//判断是否申请内存成功
+	p->data = e;//不同的数据类型的赋值方式不同，比如整数和字符串
+	p->next = NULL;//必须操作，因为这里的p将会变成队列的最后一个元素，最后一个的指针域必须为NULL
+	LQ->rear->next = p;
+	LQ->rear = p;
+	return 1;
+}
+
+//出队列
+int LinkDeQueue(QLink* LQ, int* e)
+{
+	//判断队列是否为空
+	if (LQ->front == LQ->rear)
+		return 0;
+	QueueLink p = LQ->front->next;//p为第一个结点
+	*e = p->data;//不同的数据类型的赋值方式不同，比如整数和字符串
+	LQ->front->next = p->next;//改变头结点的指向位置
+	if (LQ->rear == p)
+		LQ->rear = LQ->front;//处理队列只有一个元素的情况
+	free(p);
+	return 1;
+}
+
+//遍历操作
+void LinkQueueTravers(QLink Q)
+{
+	QueueLink p=Q.front->next;
+	while (p)
+	{
+		printf("%d ", p->data);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+int main()
+{
+	QLink Q;
+	int e;
+	InitLinkQueue(&Q);
+	printf("未入列表时的元素个数：>\t%d\n", LinkQueueLenght(Q));
+	printf("判断表是否为空：>\t");
+	if (LinkQueueEmpty(Q) == 1)
+		printf("表为空\n");
+	else
+		printf("表不为空\n");
+	printf("向队列中输入十个元素后\n");
+	for (int i = 0; i < 10; i++)//向列表中进入十个元素
+	{
+		LinkEnQueue(&Q, i);
+	}
+	printf("判断表是否为空：>\t");
+	if (LinkQueueEmpty(Q) == 1)
+		printf("表为空\n");
+	else
+		printf("表不为空\n");
+	printf("入列表后的表长度：>\t%d\n", LinkQueueLenght(Q));
+	LinkQueueGetHead(Q, &e);
+	printf("得到表头：>\t%d\n", e);
+	printf("未出队前遍历操作：\n");
+	LinkQueueTravers(Q);
+	printf("出列表并输出前面五个元素:\n");
+	for (int i = 0; i < 5; i++)
+	{
+		LinkDeQueue(&Q, &e);
+		printf("%d ", e);
+	}
+	printf("\n");
+	printf("出队后遍历操作：\n");
+	LinkQueueTravers(Q);
+	printf("判断表是否为空：>\t");
+	if (LinkQueueEmpty(Q) == 1)
+		printf("表为空\n");
+	else
+		printf("表不为空\n");
+	printf("出列表后的表长度：>\t%d\n", LinkQueueLenght(Q));
+	LinkQueueGetHead(Q, &e);
+	printf("得到表头：>\t%d\n", e);		
+	return 0;
+}
