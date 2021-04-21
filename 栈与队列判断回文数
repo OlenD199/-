@@ -1,0 +1,160 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//链队列的结构体定义
+typedef struct qnode
+{
+	char data;
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+//链栈的结构体定义
+typedef struct snode
+{
+	char data;
+	struct snode* next;
+}Snode,*LinkStack;
+
+//链队列的初始化
+int InitLinkQueue(QLink* LQ)
+{
+	LQ->front = LQ->rear = (LinkQueue)malloc(sizeof(Qnode));
+	if (LQ->front == NULL)
+		return 0;//内存分配失败
+	LQ->front->next = NULL;
+	return 1;
+}
+
+//链栈的初始化
+void InitLinkStack(LinkStack* LS)
+{
+	*LS = NULL;
+}
+
+//入栈操作
+int LinkStackPush(LinkStack* LS, char e)
+{
+	LinkStack p = (LinkStack)malloc(sizeof(Snode));
+	p->data = e;
+	p->next = *LS;
+	*LS = p;
+	return 1;
+}
+
+//出栈操作
+int LinkStackPop(LinkStack* LS, char* e)
+{
+	if (*LS == NULL)
+		return 0;//栈空
+	LinkStack p;
+	p = *LS;
+	*e = p->data;
+	*LS = (*LS)->next;
+	free(p);
+	return 1;
+}
+
+//判断栈空
+int LinkStackEmpty(LinkStack S)
+{
+	if (S == NULL)
+		return 1;
+	return 0;
+}
+
+//入队操作
+int LinkEnQueue(QLink* LQ, char e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(Snode));
+	p->data = e;
+	p->next = NULL;//必须操作
+	(*LQ).rear->next = p;
+	(*LQ).rear = p;
+	return 1;
+}
+
+//出队操作
+int LinkDeQueue(QLink* LQ, char *e)
+{
+	if (LQ->front == LQ->rear)
+		return 0;//队空
+	LinkQueue p;
+	p = LQ->front->next;
+	*e = p->data;
+	LQ->front->next = p->next;
+	if (LQ->rear == p)
+		LQ->rear = LQ->front;
+	free(p);
+	return 1;
+}
+
+//判断队空
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+
+
+//回文数判断
+int JudgePalNum(char* arr)
+{
+	QLink Q;
+	LinkStack S;
+	InitLinkQueue(&Q);
+	InitLinkStack(&S);
+	int i = 0;
+	while (arr[i] != '@')
+	{
+		LinkStackPush(&S,arr[i]);
+		i++;
+	}
+	i++;
+	while (arr[i] != '#')
+	{
+		LinkEnQueue(&Q, arr[i]);
+		i++;
+	}
+	int tag = 1;
+	char jud1;
+	char jud2;
+	while (1)
+	{
+		LinkDeQueue(&Q, &jud1);
+		LinkStackPop(&S, &jud2);
+		if (jud1 != jud2)
+		{
+			tag = 0;
+			break;
+		}
+		if (LinkStackEmpty(S) || LinkQueueEmpty(Q))
+			break;
+	}
+	if (tag == 1 && LinkStackEmpty(S) && LinkQueueEmpty(Q))
+		return 1;
+	else
+		return 0;
+}
+
+int main()
+{
+	char arr[20] = { 0 };
+	printf("请输入相关信息：>\t");
+	scanf("%s", arr);
+	int ret = JudgePalNum(arr);
+	if (ret == 1)
+		printf("YES\n");
+	else
+		printf("NO\n");
+	return 0;
+}
