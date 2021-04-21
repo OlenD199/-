@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//结构体定义
+typedef struct tnode
+{
+	int data;
+	struct tnode* lchild;
+	struct tnode* rchild;
+}TNode, * TriTree;
+
+int PreOrder(TriTree T)
+{
+	if (T == NULL)
+		return 0;
+	else
+	{
+		printf("%d ", T->data);
+		PreOrder(T->lchild);
+		PreOrder(T->rchild);
+	}
+	return 1;
+}
+
+int InOrder(TriTree T)
+{
+	if (T == NULL)
+		return 0;
+	else
+	{
+		InOrder(T->lchild);
+		printf("%d ", T->data);
+		InOrder(T->rchild);
+	}
+	return 1;
+}
+
+int PostOrder(TriTree T)
+{
+	if (T == NULL)
+		return 0;
+	else
+	{
+		PostOrder(T->lchild);
+		PostOrder(T->rchild);
+		printf("%d ", T->data);
+	}
+	return 1;
+}
+
+
+
+int main()
+{
+	TriTree t1 = (TriTree)malloc(sizeof(TNode));
+	TriTree t2 = (TriTree)malloc(sizeof(TNode));
+	TriTree t3 = (TriTree)malloc(sizeof(TNode));
+	TriTree t4 = (TriTree)malloc(sizeof(TNode));
+	TriTree t5 = (TriTree)malloc(sizeof(TNode));
+	TriTree t6 = (TriTree)malloc(sizeof(TNode));
+	t1->data = 1;
+	t1->lchild = t2;
+	t1->rchild = t3;
+	t2->data = 2;
+	t2->lchild = t4;
+	t2->rchild = t5;
+	t3->data = 3;
+	t3->lchild = t6;
+	t3->rchild = NULL;
+	t4->data = 4;
+	t4->lchild = t4->rchild = NULL;
+	t5->data = 5;
+	t5->lchild = t5->rchild = NULL;
+	t6->data = 6;
+	t6->lchild = t6->rchild = NULL;
+	//先序遍历
+	printf("先序遍历\n");
+	PreOrder(t1);
+	printf("\n");
+	//中序遍历
+	printf("中序遍历\n");
+	InOrder(t1);
+	printf("\n");
+	//后序遍历
+	printf("后序遍历\n");
+	PostOrder(t1);
+	printf("\n");
+	return 0;
+}
