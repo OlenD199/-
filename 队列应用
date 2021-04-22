@@ -1,0 +1,173 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+
+#define MAXLEN 50
+
+//循环数列的数据类型
+typedef struct
+{
+	char dept[20];
+	char docname[20];
+	char bname[20];
+	int bh;
+}PER;
+
+typedef struct
+{
+	PER data[MAXLEN];
+	int front;
+	int rear;
+	int queueSize;
+}SqQueue;
+
+//函数声明
+//初始化队列
+int InitSqQueue(SqQueue* LQ)
+{
+	LQ->queueSize = MAXLEN;
+	LQ->front = LQ->rear = 0;
+	return 0;
+}
+
+//判断队列空
+int SqQueueEmpty(SqQueue Q)
+{
+	if (Q.rear == Q.front)
+		return 1;//队空
+	else
+		return 0;
+}
+
+//出队列
+int SqDeQueue(SqQueue* LQ)
+{
+	if (LQ->front == LQ->rear)
+		return 0;//队空
+	LQ->front = (LQ->front + 1) % LQ->queueSize;
+	return 1;
+}
+
+//求队列的长度
+int SqQueueLength(SqQueue Q)
+{
+	return (Q.rear - Q.front + Q.queueSize) % Q.queueSize;
+}
+
+//进队列
+int SqEnQueue(SqQueue* LQ, PER e)
+{
+	//判断队列是否已满
+	if ((LQ->rear + 1) % LQ->queueSize == LQ->front)
+		return 0;//队列已满
+	LQ->rear = (LQ->rear + 1) % LQ->queueSize;
+	LQ->data[LQ->rear] = e;
+	return 1;
+}
+
+//得到队头
+int SqQueueGetHead(SqQueue Q,PER* e)
+{
+	if (Q.front == Q.rear)
+		return 0;
+	*e = Q.data[Q.front];
+	return 1;
+}
+
+//遍历操作
+int SqQueueTravers(SqQueue Q)
+{
+	int p = Q.front;
+	while (p != Q.rear)
+	{
+		printf("%20s%20s%20s%4d\n", Q.data[p].dept, Q.data[p].docname, Q.data[p].bname, Q.data[p].bh);
+		p = (p + 1) % Q.queueSize;
+	}
+	printf("\n");
+	return 1;
+}
+
+//菜单函数
+int menu()
+{
+	int n;
+	while (1)
+	{
+		system("cls");
+		printf("*********医院挂号模拟系统*********\n");
+		printf("1.挂号                 2.专家1叫号\n");
+		printf("3.专家2叫号            4.显示\n");
+		printf("0.推出\n");
+		printf("***********************************\n");
+		printf("请选择：>\t");
+		scanf("%d", &n);
+		if (n <= 4 && n >= 0)
+			return n;
+		else
+		{
+			printf("功能编号输入有误，重新选择！\n");
+			getchar();
+		}
+	}
+}
+
+int main()
+{
+	int num;
+	int n1 = 0;
+	int n2 = 0;
+	PER x;
+	SqQueue Q1, Q2;
+	InitSqQueue(&Q1);
+	InitSqQueue(&Q2);
+	while (1)
+	{
+		num = menu();
+		switch (num)
+		{
+		case 1:
+			printf("请输入专家1/专家2和病人姓名，用空格隔开\n");
+			scanf("%s%s", x.docname, x.bname);
+			if (strcmp(x.docname, "专家1") == 0)
+			{
+				x.bh = ++n1;
+				SqEnQueue(&Q1, x);
+			}
+			if (strcmp(x.docname, "专家2") == 0)
+			{
+				x.bh = ++n2;
+				SqEnQueue(&Q2, x);
+			}
+			printf("按任意键继续\n");
+			getch();
+			break;
+		case 2:
+			SqDeQueue(&Q1);
+			SqQueueGetHead(Q1, &x);
+			printf("请%d号病人%s去诊室1接诊\n", x.bh, x.bname);
+			printf("请按任意键继续\n");
+			getch();
+			break;
+		case 3:
+			SqDeQueue(&Q2);
+			SqQueueGetHead(Q2, &x);
+			printf("请%d号病人%s去诊室2接诊\n", x.bh, x.bname);
+			printf("请按任意键继续\n");
+			getch();
+			break;
+		case 4:
+			SqQueueGetHead(Q1, &x);
+			printf("正在诊室1就诊的是%3d号病人%8s", x.bh, x.bname);
+			printf("目前诊室1还有%d人等待就诊\n", SqQueueLength(Q1));
+			SqQueueGetHead(Q1, &x);
+			printf("正在诊室2就诊的是%3d号病人%8s", x.bh, x.bname);
+			printf("目前诊室2还有%d人等待就诊\n", SqQueueLength(Q2));
+			getch();
+			break;
+		case 0:
+			exit(0);
+		}
+	}
+	return 0;
+}
