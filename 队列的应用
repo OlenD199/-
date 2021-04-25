@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define size 9
+#define MAX 50
+
+int count = 0;
+
+//定义数组队列
+typedef struct qnode
+{
+	int data[MAX];
+	int front;
+	int rear;
+	int QueueSize;
+}SqQueue;
+
+//初始化队列
+int InitSqQueue(SqQueue* LQ)
+{
+	LQ->front = LQ->rear = 0;
+	LQ->QueueSize =MAX;
+	return 1;
+}
+
+//入队列
+int SqEnQueue(SqQueue* LQ, int e)
+{
+	if ((LQ->rear + 1) % LQ->QueueSize == LQ->front)
+		return 0;//队列已满
+	LQ->data[LQ->rear] = e;
+	LQ->rear = (LQ->rear + 1) % LQ->QueueSize;
+	return 1;
+}
+
+//出队列
+int SqDeQueue(SqQueue* LQ)
+{
+	if (LQ->front == LQ->rear)
+		return 0;//队列已空
+	LQ->front = (LQ->front + 1) % LQ->QueueSize;
+	return 1;
+}
+
+//得到队列头元素
+int GetHeadSqQueue(SqQueue Q)
+{
+	return Q.data[Q.front];
+}
+
+//排列冲突表
+void Arrange_conflict(int arr[][size])
+{
+	int ret = -1;
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			scanf("%d", &ret);
+			arr[i][j] = ret;
+		}
+	}
+}
+
+//求队列长度
+int GetSqQueueLenght(SqQueue Q)
+{
+	return (Q.rear - Q.front + Q.QueueSize) % Q.QueueSize;
+}
+
+//得到相关子集
+void GetArrangement(int sz,int arr[][size],char goal[][size])
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	for (int i = 0; i < size; i++)
+	{
+		SqEnQueue(&Q, i);
+	}
+	int i = 0;
+	int k = 0;
+	int num = sz;
+	int ret = sz;
+	while (GetSqQueueLenght(Q) != 0)
+	{
+		int cs[size] = { 0 };
+		for (i = 0; i < ret; i++)
+		{
+			int n = GetHeadSqQueue(Q);
+			SqDeQueue(&Q);
+			if (cs[n] != 0)
+				SqEnQueue(&Q, n);
+			else
+			{
+				num--;
+				goal[count][k++] = n + '0';
+				goal[count][k++] = ' ';
+				for (int j = 0; j < sz; j++)
+					cs[j] += arr[n][j];
+			}
+		}
+		ret = num;
+		count++;
+		k = 0;
+	}
+}
+
+int main()
+{
+	char goal[size][size] = { 0 };
+	int arr[size][size] = { 0 };
+	printf("运动会项目数：>\t%d\n", size);
+	Arrange_conflict(arr);
+	GetArrangement(size,arr,goal);
+	int i = 0;
+	while (goal[i][0] != '\0')
+	{
+		printf("项目 %s ", goal[i]);
+		printf("这些项目在同一时间内！\n");
+		i++;
+	}
+	return 0;
+}
