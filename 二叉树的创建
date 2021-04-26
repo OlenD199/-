@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+//结构体定义数据
+typedef struct tnode
+{
+	char data;
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode,*TTree;
+
+//队列的结构体定义
+typedef struct qnode
+{
+	char data;
+	struct qnode* next;
+}Qnode,*LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+//队列初始化
+int InitLinkQueue(QLink* TQ)
+{
+	TQ->front = TQ->rear = (LinkQueue)malloc(sizeof(Qnode));//TQ->front相当于单链表中的头结点，所以这里动态申请的时候使用LinkQueue
+	if (TQ->front == NULL)
+		return 0;
+	TQ->front->next = NULL;//头结点的下一个数据（即队列的第一个数据）赋值为NULL
+	return 1;
+}
+
+//入队
+int LinkEnQueue(QLink* TQ,TTree e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(Qnode));
+	if (p == NULL)
+		return 0;
+	p->data = e->data;
+	p->next = NULL;//必须操作
+	TQ->rear->next = p;
+	TQ->rear = p;
+	return 1;
+}
+
+//出队列
+int LinkDeQueue(QLink* TQ)
+{
+	if (TQ->front == TQ->rear)
+		return 0;//队空
+	LinkQueue p;
+	p = TQ->front->next;
+	TQ->front->next = p->next;
+	if (TQ->rear = p)
+		TQ->rear = TQ->front;//必然操作，如果没有该操作，当队列只有一个数据时，赋值给p，将p释放掉后，TQ->rear已丢失
+	free(p);
+	return 1;
+}
+
+//得到队头
+int LinkQueueGetHead(QLink Q,TTree* e)
+{
+	if (Q.front == Q.rear)
+		return 0;//队空
+	(*e)->data = Q.front->next->data;
+	return 1;
+}
+
+////根据字符串创建二叉树       递归算法
+//void crt_tree(QTree* T)//传过来的是一个地址
+//{
+//	char ch;
+//	scanf("%c", &ch);
+//	if (ch == '#')
+//		*T = NULL;
+//	else
+//	{
+//		(*T) = (TTree)malloc(sizeof(Tnode));//传进来的是一个指针，它是由上一层的左孩子或右孩子的指针
+//		(*T)->data = ch;
+//		crt_tree(&(*T)->lchild);
+//		crt_tree(&(*T)->rchild);
+//	}
+//}
+
+
+////根据字符串创建二叉树(根据队列非递归算法)
+////该算法是先读入三个数据（father， child， lrflag），当father为#时，表示该结点是根节点，当child为#时，表示其没有左右孩子，二叉树创建结束，当lrflag为0时，表示左孩子，为1时表示右孩子
+void crt_Tree(TTree* T)//T表示根节点的地址
+{
+	QLink Q;
+	InitLinkQueue(&Q);
+	*T = NULL;//将指针赋值为空，防止野指针
+	char father;
+	char child;
+	int num;
+	TTree s;
+	scanf("%c%c%d", &father, &child, &num);
+	while (child != '#')//如果child为#，表示二叉树创建完成
+	{
+		TTree p;
+		//创建结点，并进行赋值
+		p = (TTree)malloc(sizeof(Tnode));
+		p->data = child;
+		p->lchild = p->rchild = NULL;
+		LinkEnQueue(&Q, p);
+		if (father == '#')
+			*T = p;//p变为根节点
+		else
+		{
+			LinkQueueGetHead(Q, &s);
+			while (s->data != father)//由于输入的原因，如果不等于队头，表示队头的左右孩子已经创建，这时就要将这个队头去掉
+			{
+				LinkDeQueue(&Q);
+				LinkQueueGetHead(Q, &s);
+			}
+			if (num == 0)
+				s->lchild = p;
+			else
+				s->rchild = p;
+		}
+		scanf("%c%c%d", &father, &child, &num);
+	}
+
+}
+
+int main()
+{
+	TTree T;
+	//crt_tree(&T);//递归算法
+	crt_Tree(&T);//非递归算法
+	return 0;
+}
