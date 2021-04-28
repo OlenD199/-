@@ -1,0 +1,130 @@
+/*
+	层次遍历：
+		从二叉树的根结点出发，按从上到下，从左到右依次访问每一个结点
+	创建队列，队列的数据域用于存储二叉树结点的地址
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct tnode
+{
+	char data;
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode,*TTree;
+
+//队列的结构体定义
+typedef struct qnode
+{
+	TTree data;//队列的数据域用于存放二叉树中的结点的地址
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+//队列初始化
+int InitLinkQueue(QLink* TQ)
+{
+	TQ->front = TQ->rear = (LinkQueue)malloc(sizeof(Qnode));//TQ->front相当于单链表中的头结点，所以这里动态申请的时候使用LinkQueue
+	if (TQ->front == NULL)
+		return 0;
+	TQ->front->next = NULL;//头结点的下一个数据（即队列的第一个数据）赋值为NULL
+	return 1;
+}
+
+//入队
+int LinkEnQueue(QLink* TQ, TTree e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(Qnode));
+	if (p == NULL)
+		return 0;
+	p->data = e;
+	p->next = NULL;//必须操作
+	TQ->rear->next = p;
+	TQ->rear = p;
+	return 1;
+}
+
+//出队列
+int LinkDeQueue(QLink* TQ)
+{
+	if (TQ->front == TQ->rear)
+		return 0;//队空
+	LinkQueue p;
+	p = TQ->front->next;
+	TQ->front->next = p->next;
+	if (TQ->rear == p)
+		TQ->rear = TQ->front;//必然操作，如果没有该操作，当队列只有一个数据时，赋值给p，将p释放掉后，TQ->rear已丢失
+	free(p);
+	return 1;
+}
+
+//得到队头
+int LinkQueueGetHead(QLink Q, TTree* e)
+{
+	if (Q.front == Q.rear)
+		return 0;//队空
+	*e = Q.front->next->data;
+	return 1;
+}
+
+//判断队空
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	else
+		return 0;
+}
+
+//根据字符串创建二叉树       递归算法
+void crt_tree(TTree* T)//传过来的是一个地址
+{
+	char ch;
+	scanf("%c", &ch);
+	if (ch == '#')
+		*T = NULL;
+	else
+	{
+		(*T) = (TTree)malloc(sizeof(Tnode));//传进来的是一个指针，它是由上一层的左孩子或右孩子的指针
+		(*T)->data = ch;
+		crt_tree(&(*T)->lchild);
+		crt_tree(&(*T)->rchild);
+	}
+}
+
+//参差遍历
+void Layer(TTree T)
+{
+	QLink Q;
+	TTree p;
+	InitLinkQueue(&Q);
+	if (T)
+		LinkEnQueue(&Q, T);
+	while (!LinkQueueEmpty(Q))
+	{
+		LinkQueueGetHead(Q, &p);
+		LinkDeQueue(&Q);
+		printf("%c ", p->data);
+		if (p->lchild)
+			LinkEnQueue(&Q, p->lchild);
+		if (p->rchild)
+			LinkEnQueue(&Q, p->rchild);
+
+	}
+}
+
+int mian()
+{
+	TTree T;
+	crt_tree(&T);
+	Layer(T);
+	
+	return 0;
+}
