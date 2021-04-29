@@ -1,0 +1,192 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct BiTNode
+{
+	char data;
+	struct BiTNode* lchild;
+	struct BiTNode* rchild;
+}BiTNode, * BiTree;
+
+typedef struct qnode
+{
+	BiTree data;//队列的数据域用于存放树结点的地址
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct {
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+int InitLinkQueue(QLink* Q)
+{
+	Q->front = Q->rear = (LinkQueue)malloc(sizeof(Qnode));
+	if (Q->front == NULL)
+		return 0;
+	Q->front->next = NULL;
+	return 1;
+}
+
+int LinkEnQueue(QLink* Q, BiTree e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(Qnode));
+	if (p == NULL)
+		return 0;
+	p->data = e;
+	p->next = NULL;
+	Q->rear->next = p;
+	Q->rear = p;
+	return 1;
+}
+
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	else
+		return 0;
+}
+
+BiTree LinkDeQueue(QLink* Q)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	LinkQueue p;
+	BiTree bt;
+	p= Q->front->next;
+	bt = p->data;
+	Q->front->next = p->next;
+	if (Q->rear == p)
+		Q->rear = Q->front;
+	free(p);
+	return bt;
+}
+
+
+//层次遍历
+void layer(BiTree BT)
+{
+	QLink Q;
+	BiTree b;
+	InitLinkQueue(&Q);
+	if (BT)
+		LinkEnQueue(&Q, BT);
+	while (!LinkQueueEmpty(Q))
+	{
+		b = LinkDeQueue(&Q);
+		printf("%c ", b->data);
+		if (b->lchild)
+			LinkEnQueue(&Q, b->lchild);
+		if (b->rchild)
+			LinkEnQueue(&Q, b->rchild);
+	}
+}
+
+//递归创建二叉树
+//void Crt_BiTree(BiTree* T)
+//{
+//	char ch;
+//	scanf("%c", &ch);
+//	if (ch == '#')
+//		*T = NULL;
+//	else
+//	{
+//		*T = (BiTree)malloc(sizeof(BiTNode));//必须是*T，否则，不会与其双亲相联系
+//		(*T)->data = ch;
+//		Crt_BiTree(&(*T)->lchild);
+//		Crt_BiTree(&(*T)->rchild);
+//	}
+//}
+
+//查找函数，用于查找pre[ps]在ino序列中的位置
+int Search(char ino[], char str)
+{
+	int i = 0;
+	int d = 0;
+	while (ino[i] != '\0')
+	{
+		d = 1;
+		if (str == ino[i])
+			break;
+		i++;
+	}
+	if (d == 1)
+		return i;
+	else if (d == 0)
+		return -1;
+}
+
+
+//根据先序遍历和中序遍历确定二叉树
+void CrtBt(BiTree* T, char pre[], char ino[], int ps, int is, int n)
+{
+	/*
+		pre[ps...ps+n-1]为二叉树的先序遍历,n是序列字符个数    
+		ino[is...is+n-1]为二叉树的中序序列    
+			中序序列是第二次的访问，创建二叉树时是按照一条路径创建完成（直到创建了一个空结点）之后，再来创建第二条路经
+		ps是先序序列的第一个字符的位置，初值为0，创建二叉树时，会按照先序的顺序来创建结点，当先序序列中创建一个结点后，ps就需要+1来到达下一个节点
+		is是中序序列的第一个字符的位置，初值为0，当创建完一条路径时，is就会+1，
+	*/
+	int k;
+	if (n == 0)
+		*T = NULL;//n表示传经来的字符个数，当它的值为0时，表示传进来的地址应该赋空
+	else
+	{
+		k = Search(ino, pre[ps]); //用于查找pre[ps]在ino序列中的位置，找到的这个k表示pre[ps]在ino中的下标,  pre[ps]表示要创建的节点的数据
+		if (k == -1)//-1表示在pre中没有找到pre[ps]的位置，
+			*T = NULL;
+		else
+		{
+			*T = (BiTree)malloc(sizeof(BiTNode));
+			if (!T)
+				exit(0);
+			(*T)->data = pre[ps];//赋值
+			if (k == is)//k表示当前需要创建的节点在中序序列中的位置，is表示ino目前已经处理的路径，如果两个相等，表示pre[ps]没有左孩子
+				(*T)->lchild = NULL;
+			else
+				CrtBt(&(*T)->lchild, pre, ino, ps + 1, is, k - is);//传进去的参数分别是当前创建的节点的左孩子地址，两个序列
+																	//ps+1表示将要创建的下一个节点在先序序列中的下标（先序序列表示创建节点的顺序）
+																	//is表示目前已经处理的路径，那么is到k之间的数据就表示当前创建节点的左孩子的节点数据
+																	//k-is表示当前创建节点的左孩子节点数目
+			if (k == is + n - 1)//k表示pre[ps]在ino中的位置，n-1表示当前节点中最后一个数据的下标，如果这两个值相等，表示该创建的节点就是序列中的最后一个，五右孩子
+				(*T)->rchild = NULL;
+			else
+				CrtBt(&(*T)->rchild, pre, ino, ps + 1 + k - is, k + 1, n - (k - is) - 1);//传进去的参数分别是当前创建节点的右孩子，两个序列
+																						//k-is表示当前创建节点的左孩子总数目，ps+1表示当前节点的下一个，所以ps+1+k-is表示在先序序列中当前创建节点的下一个数据的下标
+																						//k-is表示当前创建节点的左孩子的总数目，k+1表示在中序序列中当前创建节点的第一个右孩子（在中序序列里）的下标
+																						//n表示加上当前创建节点的总结点数，现在要创建其右孩子，则需要传进去右孩子的数目，k-is表示当前节点的左孩子数目，再减去自身的1，所以当前节点的右孩子数目为n-（k-is）-1
+
+		}
+
+	}
+}
+
+
+int main()
+{
+	BiTree T;
+	//Crt_BiTree(&T);
+	//layer(T);
+
+	char pre[20] = { 0 };
+	char ino[20] = { 0 };
+	int ps = 0;
+	int is = 0;
+	int n = 0;
+
+	printf("请输入二叉树的先序遍历：>\t");
+	scanf("%s", pre);
+	printf("请输入二叉树的中序遍历：>\t");
+	scanf("%s", ino);
+
+	n = strlen(pre);
+
+	CrtBt(&T, pre, ino, ps, is, n);
+
+	printf("其层次遍历为：\n");
+	layer(T);
+
+	return 0;
+}
