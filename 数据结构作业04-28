@@ -1,0 +1,401 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//二叉树结构体
+typedef struct tree
+{
+	char data[20];
+	struct tree* lchild;
+	struct tree* rchild;
+}Tree, * BiTree;
+
+//二叉树结点地址队列结构体定义
+typedef struct qnode
+{
+	BiTree site;
+	struct qnode* next;
+}qnode, * LinkQueue;
+
+typedef struct
+{
+	struct qnode* front;
+	struct qnode* rear;
+}QLink;
+
+//用于输出所有路径的栈的结构体定义
+typedef struct snode
+{
+	char stdata[20];
+	struct snode* next;
+}snode, * LinkStack;
+
+//栈的初始化
+void InitLinkStack(LinkStack* S)
+{
+	*S = NULL;
+}
+
+//入栈
+void LinkStackPush(LinkStack* S, char* str)
+{
+	LinkStack p = (LinkStack)malloc(sizeof(snode));
+	strcpy(p->stdata, str);
+	p->next = *S;
+	*S = p;
+}
+
+//出栈
+int LinkStackPop(LinkStack* S)
+{
+	if (*S == NULL)
+		return 0;//栈空
+	LinkStack p = *S;
+	(*S) = (*S)->next;
+	free(p);
+	return 1;
+}
+
+//栈的遍历
+void LinkStackTravers(LinkStack S)
+{
+	LinkStack p = S;
+	if (S == NULL)
+		return;
+	while (p)
+	{
+		printf("%s   ", p->stdata);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+//队列初始化
+int InitLinkQueue(QLink* Q)
+{
+	Q->front = Q->rear = (LinkQueue)malloc(sizeof(qnode));
+	if (Q->front == NULL)
+		return 0;//申请失败
+	Q->front->next = NULL;
+	return 1;
+}
+
+//入队
+int LinkEnQueue(QLink* LQ, BiTree e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(qnode));
+	if (p == NULL)
+		return 0;
+	p->site = e;
+	p->next = NULL;
+	LQ->rear->next = p;
+	LQ->rear = p;
+	return 1;
+}
+
+//出队
+BiTree LinkDeQueue(QLink* Q)
+{
+	if (Q->front == Q->rear)
+		return 0;//队空
+	LinkQueue p = Q->front->next;
+	Q->front->next = p->next;
+	BiTree value;
+	value = p->site;
+	if (p == Q->rear)
+		Q->rear = Q->front;
+	free(p);
+	return value; 
+}
+
+//判断队空
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+//遍历队列，输出返回结点地址
+void LinkQueueTravers(QLink Q)
+{
+	LinkQueue p = Q.front->next;
+	while(p)
+	{
+		printf("%p   ", p->site);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+void menu()
+{
+	printf("1.先序字符串建立二叉树\t\t2.二叉树先序遍历输出\n");
+	printf("3.二叉树凹入输出\t\t4.层次遍历输出\n");
+	printf("5.查找指定结点返回指针\t\t6.插入指定名称结点\n");
+	printf("7.删除指定名称结点\t\t8.复制二叉树\n");
+	printf("9.输出叶子节点的路径\t\t0.推出\n");
+}
+
+//先序建立二叉树
+void CrtTreeByPre(BiTree* T)
+{
+	char ch[20];
+	scanf("%s", ch);
+	if (ch[0] == '#')
+		*T = NULL;
+	else
+	{
+		*T = (BiTree)malloc(sizeof(Tree));
+		strcpy((*T)->data, ch);
+		CrtTreeByPre(&(*T)->lchild);
+		CrtTreeByPre(&(*T)->rchild);
+	}
+}
+
+//先序输出二叉树
+void PrintByPreOrder(BiTree T)
+{
+	if (T)
+	{
+		printf("%s  ", T->data);
+		PrintByPreOrder(T->lchild);
+		PrintByPreOrder(T->rchild);
+	}
+}
+
+//凹入输出字符串
+void PrintByInvag(BiTree T,int level,char InvagChar)
+{
+	if (T)
+	{
+		for (int i = 0; i < level; i++)
+		{
+			printf("\t");
+		}
+		printf("%s(%c)", T->data, InvagChar);
+		int length = (int)strlen(T->data);
+		for (int i = length + 12; i < 30; i++)
+			printf("-");
+		printf("\n");
+		PrintByInvag(T->lchild, level + 1, 'L');
+		PrintByInvag(T->rchild, level + 1, 'R');
+	}
+}
+
+//层次遍历
+void PrintByLevelTraver(BiTree T)
+{
+	QLink Q;
+	BiTree p;
+	InitLinkQueue(&Q);
+	if (T)
+		LinkEnQueue(&Q, T);
+	while (!LinkQueueEmpty(Q))
+	{
+		p = LinkDeQueue(&Q);
+		printf("%s  ", p->data);
+		if (p->lchild)
+			LinkEnQueue(&Q, p->lchild);
+		if (p->rchild)
+			LinkEnQueue(&Q, p->rchild);
+	}
+}
+
+//查找指定结点返回指针
+void FindAReturnByName(BiTree T, char* str, QLink* Q2)
+{
+	if (T)
+	{
+		if (strcmp(str, T->data) == 0)
+			LinkEnQueue(Q2, T);
+		FindAReturnByName(T->lchild, str, Q2);
+		FindAReturnByName(T->rchild, str, Q2);
+	}
+}
+
+//插入指定名称结点
+int InsertByName(BiTree* T, char* str, char ch,int state, char* str1)
+{
+	int n = state;
+	if (T)
+	{
+		if (strcmp(str, (*T)->data) == 0)
+		{
+			if (ch == 'L')
+			{
+				if ((*T)->lchild == NULL)
+				{
+					(*T)->lchild = (BiTree)malloc(sizeof(tree));
+					(*T)->lchild->lchild = NULL;
+					(*T)->lchild->rchild = NULL;
+					strcpy((*T)->lchild->data, str1);
+					state = 1;
+				}
+				else
+					printf("该位置已经有数据，无法插入！\n");
+			}
+			if (ch == 'R')
+			{
+				if ((*T)->rchild == NULL)
+				{
+					(*T)->rchild = (BiTree)malloc(sizeof(tree));
+					(*T)->rchild->lchild = NULL;
+					(*T)->rchild->rchild = NULL;
+					strcpy((*T)->rchild->data, str1);
+					state = 1;
+				}
+				else
+					printf("该位置已经有数据，无法插入！\n");
+			}
+		}
+		if ((*T)->lchild != NULL)
+			state = InsertByName(&(*T)->lchild, str, ch, state, str1);
+		if ((*T)->rchild != NULL)
+			state = InsertByName(&(*T)->rchild, str, ch, state, str1);
+	}
+	if (n == 0)
+		n = state;
+	return state;
+}
+
+//删除指定名称结点
+void DeleteByName(BiTree* T, char* str)
+{
+	if (T)
+	{
+		if((*T)->lchild!=NULL)
+		DeleteByName(&(*T)->lchild, str);
+		if ((*T)->rchild != NULL)
+		DeleteByName(&(*T)->rchild, str);
+		if (strcmp((*T)->data , str)==0)
+			*T = NULL;
+	}
+}
+
+//复制二叉树
+void CopyBiTree(BiTree T, BiTree* Tcpy)
+{
+	if (T)
+	{
+			*Tcpy = (BiTree)malloc(sizeof(Tree));
+			strcpy((*Tcpy)->data, T->data);
+			(*Tcpy)->lchild = (*Tcpy)->rchild = NULL;
+			CopyBiTree(T->lchild, &(*Tcpy)->lchild);
+			CopyBiTree(T->rchild, &(*Tcpy)->rchild);
+	}
+	else
+		*Tcpy = NULL;
+}
+
+//输出叶子节点的路径
+void PrintLeafNodeAllPath(BiTree T, LinkStack* S)
+{
+	if (T)
+	{
+		LinkStackPush(S,T->data);
+		PrintLeafNodeAllPath(T->lchild, S);
+		PrintLeafNodeAllPath(T->rchild, S);
+		if (T->lchild == NULL && T->rchild == NULL)
+		{
+			LinkStackTravers(*S);
+			LinkStackPop(S);
+		}
+	}
+}
+
+
+int main()
+{
+	BiTree T;
+	T = NULL;
+	int num = 1;
+	int a = -1;
+	int b = 1;
+	int state = 0;
+	char str[20] = { 0 };
+	char str1[20] = { 0 };
+	char ch = { 0 };
+	int count = 0;//计数器，二叉树中可能有多个要求返回的节点地址
+	while (num)
+	{
+		menu();
+		printf("请输入相关数字：>\t");
+		scanf("%d", &num);
+		switch (num)
+		{
+		case 1:
+			printf("请输入相关字符串：(空结点用#表示)\n");
+			CrtTreeByPre(&T);
+			break;
+		case 2:
+			PrintByPreOrder(T);
+			printf("\n");
+			break;
+		case 3:
+			PrintByInvag(T, 0, 'D');
+			printf("\n");
+			break;
+		case 4:
+			PrintByLevelTraver(T);
+			printf("\n");
+			break;
+		case 5:
+			QLink Q2;//用于存储要查询的结点的地址
+			InitLinkQueue(&Q2);
+			printf("请输入要查询的结点的内容：>\t");
+			scanf("%s", str);
+			FindAReturnByName(T,str,&Q2);
+			printf("得到地址为：\n");
+			LinkQueueTravers(Q2);
+			break;
+		case 6:
+			printf("请输入要插入的结点的名称：>\t");
+			scanf("%s", str);
+			printf("请输入插入的位置（左孩子用L，右孩子用R）:>\t");
+			getchar();
+			scanf("%c", &ch);
+			printf("请输入要插入的内容：>\t");
+			scanf("%s", str1);
+			if (ch == 'L' || ch == 'R')
+			{
+				a = InsertByName(&T, str, ch, state, str1);
+				b = 0;
+			}
+			else
+			{
+				printf("输入的位置有误！\n");
+				break;
+			}
+			if (a == 0&&b == 0)
+				printf("输入的名称未找到！\n");
+			break;
+		case 7:
+			printf("请输入要删除的结点的名称：>\t");
+			scanf("%s", str);
+			printf("\n");
+			DeleteByName(&T, str);
+			break;
+		case 8:
+			BiTree Tcpy;
+			CopyBiTree(T, &Tcpy);
+			printf("得到复制二叉树的层次遍历为：\n");
+			PrintByLevelTraver(Tcpy);
+			printf("\n");
+			break;
+		case 9:
+			LinkStack S;
+			InitLinkStack(&S);
+			PrintLeafNodeAllPath(T, &S);
+			break;
+		case 0:
+			break;
+		default:
+			printf("输入操作数字错误，请重新输入！\n");
+			break;
+		}
+	}
+	return 0;
+}
+
+
