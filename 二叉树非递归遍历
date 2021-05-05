@@ -1,0 +1,190 @@
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+//基于任务分析的二叉树递归的非遍历实现
+
+#define StackMAX 20
+
+//二叉树结构体定义
+typedef struct tnode
+{
+	char data;
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode,* BiTree;
+
+//栈的数据元素结构体定义
+typedef struct
+{
+	BiTree ptr;//存放二叉树结点的地址
+	int task;//0/1判断访问还是遍历,1表示遍历，0表示访问
+}ElemType;
+
+//顺序栈
+typedef struct
+{
+	ElemType data[StackMAX];
+	int top;
+	int QueueSize;
+}SqStack;
+
+int InitSqStack(SqStack* S)
+{
+	S->top = -1;
+	S->QueueSize = StackMAX;
+	return 1;
+}
+
+int SqStackPush(SqStack* S, ElemType e)
+{
+	S->top++;
+	S->data[S->top] = e;
+	return 1;
+}
+
+int SqStackEmpty(SqStack S)
+{
+	if (S.top == -1)
+		return 1;//栈空
+	return 0;
+}
+
+int SqStackPop(SqStack* S, ElemType* e)
+{
+	if (S->top == -1)
+		return 0;//栈空
+	*e = S->data[S->top];
+	S->top--;
+	return 1;
+}
+
+//中序遍历实现函数
+void Inorder_iter(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	ElemType e;
+	e.ptr = T;
+	e.task = 1;//先将根节点放入栈里，要遍历根节点，task变为1
+	if (T)
+		SqStackPush(&S, e);//把根节点的相关信息压入栈里
+	while (!SqStackEmpty(S))
+	{
+		SqStackPop(&S, &e);//出栈
+		if (e.task == 0)//如果栈顶元素为1表示遍历，0表示访问
+			printf("%c ", e.ptr->data);//访问
+		else//遍历栈顶元素
+		{
+			BiTree p;
+			p = e.ptr;
+			e.ptr = p->rchild;//设为右孩子结点
+			if (e.ptr)
+				SqStackPush(&S, e);//如果右孩子非空，则压入栈中；因为需要先遍历右孩子，所以task任为1
+			e.ptr = p;//设置该结点
+			e.task = 0;//task设为0，用于访问
+			SqStackPush(&S, e);//将该结点压入栈中
+			e.ptr = p->lchild;//设为左孩子
+			e.task = 1;//遍历左孩子，task变为1
+			if (e.ptr)
+				SqStackPush(&S, e);//左孩子结点入栈
+		}
+	}
+}
+
+void Crt_Tree(BiTree* T)
+{
+	char ch = 0;
+	scanf("%c", &ch);
+	if (ch == '#')
+		*T = NULL;
+	else
+	{
+		*T = (BiTree)malloc(sizeof(Tnode));
+		(*T)->data = ch;
+		Crt_Tree(&(*T)->lchild);
+		Crt_Tree(&(*T)->rchild);
+	}
+}
+
+//先序遍历实现函数
+void Preorder_iter(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	ElemType e;
+	e.ptr = T;
+	e.task = 1;
+	if (T)
+		SqStackPush(&S, e);
+	while (!SqStackEmpty(S))
+	{
+		SqStackPop(&S, &e);
+		if (e.task == 0)
+			printf("%c ", e.ptr->data);
+		else
+		{
+			BiTree p;
+			p = e.ptr;
+			e.ptr = p->rchild;
+			if(e.ptr)
+				SqStackPush(&S, e);
+			e.ptr = p->lchild;
+			if (e.ptr)
+				SqStackPush(&S, e);
+			e.ptr = p;
+			e.task = 0;
+			SqStackPush(&S, e);
+		}
+	}
+}
+
+//后序遍历
+void Postorder_iter(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	ElemType e;
+	e.ptr = T;
+	e.task = 1;
+	if (T)
+		SqStackPush(&S, e);
+	while (!SqStackEmpty(S))
+	{
+		SqStackPop(&S, &e);
+		if (e.task == 0)
+			printf("%c ", e.ptr->data);
+		else
+		{
+			BiTree p;
+			p = e.ptr;
+			e.task = 0;
+			SqStackPush(&S, e);
+			e.ptr = p->rchild;
+			e.task = 1;
+			if (e.ptr)
+				SqStackPush(&S, e);
+			e.ptr = p->lchild;
+			if (e.ptr)
+				SqStackPush(&S, e);
+		}
+	}
+}
+
+int main()
+{
+	BiTree T;
+	Crt_Tree(&T);
+	printf("基于任务分析的先序遍历：\n");
+	Preorder_iter(T);
+	printf("\n");
+	printf("基于任务分析的中序遍历：\n");
+	Inorder_iter(T);
+	printf("\n");
+	printf("基于任务分析的后序遍历：\n");
+	Postorder_iter(T);
+	printf("\n");
+
+	return 0;
+}
