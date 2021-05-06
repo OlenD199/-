@@ -1,0 +1,203 @@
+
+//基于搜索路径分析的二叉树遍历算法的非递归实现
+
+/*
+		路径分析法是根据遍历路径的路线从根结点开始眼左子树深入下去，标记数组为L，当深入到最左端时
+	（即左子树为空）则返回，标记数组由L变为R，在深入刚才结点的右子树，在进行如此深入与返回。
+		先序遍历是在将结点压入栈之前访问，中序遍历是在标记数组有L变为R时访问，后序遍历是出栈时访问,
+	所以先序实在入栈之前访问输出，中序遍历是在出栈之后访问输出，所以先序和中序没有用到标记数组。
+		在进行函数遍历时，遍历顺序与先序遍历相同（找到左子树，再找右子树）。
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAXSIZE 100
+
+//二叉树结构体定义
+typedef struct tnode
+{
+	char data;
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode,* BiTree;
+
+//栈的结构体定义
+typedef struct snode
+{
+	BiTree* site;
+	int StackSize;
+	int top;
+}SqStack;
+
+void InitSqStack(SqStack* S)
+{
+	S->site = (BiTree*)malloc(sizeof(BiTree) * MAXSIZE);
+	if (S->site == NULL)
+		return;
+	S->top = -1;
+	S->StackSize = MAXSIZE;
+}
+
+int SqStackPush(SqStack* S, BiTree T)
+{
+	if (S->top+1 == S->StackSize)
+		return 0;//栈的位置已满
+	S->top++;
+	S->site[S->top] = T;
+	return 1;
+}
+
+int SqStackEmpty(SqStack S)
+{
+	if (S.top == -1)
+		return 1;
+	return 0;
+}
+
+int SqStackPop(SqStack* S, BiTree* t)
+{
+	if (S->top == -1)
+		return 0;//栈空
+	*t = S->site[S->top];
+	S->top--;
+	return 1;
+}
+
+int SqStackGetTop(SqStack S, BiTree* t)
+{
+	if (S.top == -1)
+		return 0;
+	*t = S.site[S.top];
+	return 1;
+}
+
+//遍历创建二叉树
+void Crt_Tree(BiTree* T)
+{
+	char ch;
+	scanf("%c", &ch);
+	if (ch == '#')
+		*T = NULL;
+	else
+	{
+		*T = (BiTree)malloc(sizeof(Tnode));
+		(*T)->data = ch;
+		Crt_Tree(&(*T)->lchild);
+		Crt_Tree(&(*T)->rchild);
+	}
+}
+
+//寻找子树最左下方的结点
+BiTree PriGoFarLeft(BiTree T, SqStack* S, char* c)
+{
+	if (!T)
+		return NULL;
+	while (T)
+	{
+		SqStackPush(S, T);//如果左子树非空，就把它压入栈中
+		c[S->top] = 'L';//因为时遍历左子树，所以标记数组记为L
+		if (T->lchild == NULL)
+			break;
+		T = T->lchild;
+	}
+	return T;//寻找最后的左子树，直到为空
+}
+
+
+void NrPostOrder(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	char lrtag[MAXSIZE] = "";
+	BiTree t;
+	t = PriGoFarLeft(T, &S, lrtag);
+	while (t)
+	{
+		lrtag[S.top] = 'R';//第二次遇到，标记数组改为R（第一次遇到实在寻找左子树函数里面，压栈的时候）
+		if (t->rchild)//已经判断过其左子树，所以这里判断其右子树
+			t = PriGoFarLeft(t->rchild, &S, lrtag);
+		else
+			while (!SqStackEmpty(S) && lrtag[S.top] == 'R')//第三次遇到，出栈并输出
+			{
+				SqStackPop(&S, &t);
+				printf("%c ", t->data);
+			}
+		if (!SqStackEmpty(S))
+			SqStackGetTop(S, &t);//后序遍历时，根节点最后输出，如果栈为空，表示所有结点都已输出
+		else
+			t = NULL;//指针赋空，避免野指针，同时用于判断
+	}
+}
+
+//先序遍历
+void NrPreOrder(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	BiTree p;
+	if (T == NULL)
+		return;
+	p = T;
+	while (p != NULL || !SqStackEmpty(S))
+	{
+		while (p != NULL)//深入左子树
+		{
+			printf("%c ", p->data);//先序遍历先输出再入栈
+			SqStackPush(&S, p);
+			p = p->lchild;
+		}//while循环会将p指向最后一个左子树，再进行右子树判断
+		if (SqStackEmpty(S))
+			return;
+		else
+		{
+			SqStackPop(&S, &p);//第二次访问栈顶元素，出栈
+			p = p->rchild;//指向其右子树
+		}
+	}
+}
+
+//中序遍历
+void NrInOrder(BiTree T)
+{
+	SqStack S;
+	InitSqStack(&S);
+	BiTree p;
+	p = T;
+	if (T == NULL)
+		return;
+	while (p != NULL || !SqStackEmpty(S))
+	{
+		while (p != NULL)
+		{
+			SqStackPush(&S, p);
+			p = p->lchild;
+		}
+		if (SqStackEmpty(S))
+			return;
+		else
+		{
+			SqStackPop(&S, &p);
+			printf("%c ", p->data);//中序遍历先出栈再访问输出
+			p = p->rchild;
+		}
+	}
+}
+
+int main()
+{
+	BiTree T;
+	Crt_Tree(&T);
+	printf("基于搜索路径的二叉树非递归遍历的先序遍历：\n");
+	NrPreOrder(T);
+	printf("\n");
+	printf("基于搜索路径的二叉树非递归遍历的中序遍历：\n");
+	NrInOrder(T);
+	printf("\n");
+	printf("基于搜索路径的二叉树非递归遍历的后序遍历：\n");
+	NrPostOrder(T);
+	printf("\n");
+
+	return 0;
+}
