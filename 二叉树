@@ -1,0 +1,349 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX 32
+
+typedef struct tnode
+{
+	char data[32];
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode, * BiTree;
+
+typedef struct
+{
+	BiTree* site;
+	int front;
+	int rear;
+	int QueueSize;
+}SqQueue;
+
+//队列处理
+
+void InitSqQueue(SqQueue* Q)
+{
+	Q->site = (BiTree*)malloc(sizeof(BiTree));
+	if (Q->site == NULL)
+		return;
+	Q->front = Q->rear = 0;
+	Q->QueueSize = MAX;
+}
+
+int SqEnQueue(SqQueue* Q, BiTree p)
+{
+	if ((Q->rear + 1) % Q->QueueSize == Q->front)
+		return 0;
+	Q->site[Q->rear] = p;
+	Q->rear = (Q->rear + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqDeQueue(SqQueue* Q, BiTree* p)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	*p = Q->site[Q->front];
+	Q->front = (Q->front + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqQueueEmpty(SqQueue Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+int SqQueueGetTop(SqQueue Q, BiTree* p)
+{
+	if (Q.front == Q.rear)
+		return 0;
+	*p = Q.site[Q.front];
+	return 1;
+}
+
+void Crt_Tree(BiTree* T)
+{
+	char ch[MAX];
+	scanf("%s", ch);
+	if (ch[0] == '#')
+		*T = NULL;
+	else
+	{
+		*T = (BiTree)malloc(sizeof(Tnode));
+		strcpy((*T)->data, ch);
+		Crt_Tree(&(*T)->lchild);
+		Crt_Tree(&(*T)->rchild);
+	}
+}
+
+void Crt_Tree2(BiTree* T)
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	char father[MAX];
+	char self[MAX];
+	int status;
+	BiTree t;
+	printf("请输入父结点数据，该结点数据，与父结点的关系：>\n");
+	scanf("%s %s %d", father, self, &status);
+	while (self[0] != '#')
+	{
+		BiTree p = (BiTree)malloc(sizeof(Tnode));
+		strcpy(p->data, self);
+		p->lchild = p->rchild = NULL;
+		SqEnQueue(&Q, p);
+		if (father[0] == '#')
+			*T = p;
+		else
+		{
+			SqQueueGetTop(Q, &t);
+			while (strcmp(t->data, father))
+			{
+				SqDeQueue(&Q, &t);
+				SqQueueGetTop(Q, &t);
+			}
+			if (status == 0)
+				t->lchild = p;
+			else if (status == 1)
+				t->rchild = p;
+		}
+		//	printf("请输入父结点数据，该结点数据，与父结点的关系：>\n");
+		scanf("%s %s %d", father, self, &status);
+	}
+}
+
+void PreOrder(BiTree T)
+{
+	if (T)
+	{
+		printf("%s  ", T->data);
+		PreOrder(T->lchild);
+		PreOrder(T->rchild);
+	}
+}
+
+void menu()
+{
+	printf("1.递归创建二叉树     2.非递归创建二叉树\n");
+	printf("3.先序遍历           4.凹入遍历输出\n");
+	printf("5.层次遍历输出       6.寻找指定结点指针\n");
+	printf("7.删除结点           8.插入结点\n");
+	printf("9.找到父结点         0.退出\n");
+}
+
+void AoruPrint(BiTree T, int level, char ch)
+{
+	if (T)
+	{
+		int i;
+		for (i = 0; i < level; i++)
+			printf("	");
+		printf("%s(%c)", T->data, ch);
+		for (i = 0; i < 20; i++)
+			printf("-");
+		printf("\n");
+		AoruPrint(T->lchild, level + 1, 'L');
+		AoruPrint(T->rchild, level + 1, 'R');
+	}
+}
+
+void BiTreeLayer(BiTree T)
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	BiTree p;
+	p = T;
+	if (T == NULL)
+		return;
+	SqEnQueue(&Q, p);
+	BiTree t;
+	while (!SqQueueEmpty(Q))
+	{
+		SqDeQueue(&Q, &t);
+		printf("%s	", t->data);
+		if (t->lchild)
+			SqEnQueue(&Q, t->lchild);
+		if (t->rchild)
+			SqEnQueue(&Q, t->rchild);
+	}
+}
+
+void FindByName(BiTree T, BiTree* p, char* name)
+{
+	if (T)
+	{
+		if (strcmp(T->data, name) == 0)
+			*p = T;
+		FindByName(T->lchild, p, name);
+		FindByName(T->rchild, p, name);
+	}
+}
+
+BiTree FindByNameCanStop(BiTree T, char* name)
+{
+	if (T)
+	{
+		if (strcmp(T->data, name) == 0)
+		{
+			return T;
+		}
+		FindByNameCanStop(T->lchild, name);
+		FindByNameCanStop(T->rchild, name);
+	}
+	else
+		return NULL;
+}
+
+void DesTory(BiTree T)
+{
+	if (T)
+	{
+		BiTree p = T;
+		DesTory(p->lchild);
+		DesTory(p->rchild);
+		free(p);
+	}
+}
+
+void DeleteByName(BiTree* T, char* name)
+{
+	if(*T)
+	{
+		if (strcmp((*T)->data, name) == 0)
+		{
+			DesTory(*T);
+			*T = NULL;
+		}
+		else
+		{
+			DeleteByName(&(*T)->lchild, name);
+			DeleteByName(&(*T)->rchild, name);
+		}
+	}
+}
+
+void FindFaNameByIt(BiTree T, char* name, BiTree Fa, BiTree* b)
+{
+	if (T)
+	{
+		if (strcmp(T->data, name) == 0)
+		{
+			*b = Fa;
+		}
+		else
+		{
+			FindFaNameByIt(T->lchild, name, T, b);
+			FindFaNameByIt(T->rchild, name, T, b);
+		}
+	}
+}
+
+void InsertByFaName(BiTree* T, char* fname, char* name)
+{
+	BiTree b;
+	BiTree s;
+	b = FindByNameCanStop(*T, fname);
+	if (b)
+	{
+		if (b->lchild != NULL && b->rchild != NULL)
+		{
+			printf("该父结点的子结点已满!\n");
+		}
+		else
+		{
+			if (b->lchild == NULL)
+			{
+				s = (BiTree)malloc(sizeof(Tnode));
+				strcpy(s->data, name);
+				s->lchild = s->rchild = NULL;
+				b->lchild = s;
+			}
+			else if (b->rchild == NULL)
+			{
+				s = (BiTree)malloc(sizeof(Tnode));
+				strcpy(s->data, name);
+				s->lchild = s->rchild = NULL;
+				b->rchild = s;
+			}
+		}
+	}
+	else
+		printf("该结点不存在!");
+}
+
+
+
+int main()
+{
+	BiTree fa;
+	BiTree b;
+	BiTree T = NULL;
+	int num = 1;
+	char fname[MAX] = { 0 };
+	BiTree s;
+	char name[MAX];
+	while (num)
+	{
+		menu();
+		printf("请选择操作数字:>\t");
+		scanf("%d", &num);
+		switch (num)
+		{
+		case 1:
+			Crt_Tree(&T);
+			break;
+		case 2:
+			Crt_Tree2(&T);
+			break;
+		case 3:
+			PreOrder(T);
+			printf("\n");
+			break;
+		case 4:
+			AoruPrint(T, 0, 'D');
+			break;
+		case 5:
+			BiTreeLayer(T);
+			printf("\n");
+			break;
+		case 6:
+			//char name[MAX];
+			printf("请输入指定结点的数据:>");
+			scanf("%s", name);
+			FindByName(T, &s, name);
+			printf("该位置的结点元素数据为：%s\n", s->data);
+			break;
+		case 7:
+			printf("请输入指定结点的数据:>\t");
+			scanf("%s", name);
+			DeleteByName(&T, name);
+			break;
+		case 8:
+			printf("请输入父结点的数据:>\t");
+			scanf("%s", fname);
+			printf("请输入要插入的数据:>\t");
+			scanf("%s", name);
+			InsertByFaName(&T, fname, name);
+			break;
+		case 9:
+			fa = T;
+			printf("请输入指定结点的数据:>");
+			scanf("%s", name);
+			FindFaNameByIt(T, name, fa, &b);
+			if (b == T)
+				printf("该结点时头结点，无父结点!\n");
+			else if (b)
+				printf("其父结点的数据为：%s\n", b->data);
+			else
+				printf("未找到该位置\n");
+			break;
+		case 0:
+			printf("再见了你哩！\n");
+			break;
+		}
+	}
+
+	return 0;
+}
