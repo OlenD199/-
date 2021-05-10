@@ -1,0 +1,160 @@
+//树与森林转化成其对应的二叉树（孩子兄弟链表表示方法）
+//输入边创建与其对应的二叉树
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+typedef struct CSnode
+{
+	char data;
+	struct CSnode* fchild;
+	struct CSnode* nextsibling;
+}CSNode, * CSTree;
+
+typedef struct qnode
+{
+	CSTree data;
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+int InitLinkQueue(QLink* Q)
+{
+	Q->front = Q->rear = (LinkQueue)malloc(sizeof(Qnode));
+	if (Q->front == NULL)
+		return 0;
+	Q->front->next = NULL;
+	return 1;
+}
+
+int LinkEnQueue(QLink* Q, CSTree p)
+{
+	LinkQueue s = (LinkQueue)malloc(sizeof(Qnode));
+	if (s == NULL)
+		return 0;
+	s->data = p;
+	s->next = NULL;
+	Q->rear->next = s;
+	Q->rear = s;
+	return 1;
+}
+
+CSTree LinkQueueGetHead(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 0;//队空
+	return Q.front->next->data;
+}
+
+int LinkDeQueue(QLink* Q)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	LinkQueue p;
+	p = Q->front->next;//Q->front 相当于头结点
+	Q->front->next = p->next;
+	if (p == Q->rear)
+		Q->rear = Q->front;
+	free(p);
+	return 1;
+}
+
+void Crt_CSTree(CSTree* T)
+{
+	CSTree t;
+	CSTree r;
+	r = NULL;
+	QLink Q;
+	InitLinkQueue(&Q);
+	*T = NULL;
+	char ch;
+	char fa;
+	scanf("%c %c", &fa, &ch);
+	while (ch != '#')
+	{
+		CSTree p = (CSTree)malloc(sizeof(CSNode));
+		p->data = ch;
+		p->fchild = p->nextsibling = NULL;
+		LinkEnQueue(&Q, p);
+		if (fa == '#')
+			*T = p;
+		else
+		{
+			t = LinkQueueGetHead(Q);
+			while (t->data != fa)
+			{
+				LinkDeQueue(&Q);
+				t = LinkQueueGetHead(Q);
+			}
+			if (t->fchild == NULL)
+			{
+				t->fchild = p;
+				r = p;
+			}
+			else
+			{
+				r->nextsibling = p;
+				r = p;
+			}
+		}
+		getchar();
+		scanf("%c %c", &fa, &ch);
+	}
+
+}
+
+//先序遍历树
+void pre_order_Tree(CSTree T)
+{
+	if (T)
+	{
+		printf("%c\t", T->data);
+		pre_order_Tree(T->fchild);
+		pre_order_Tree(T->nextsibling);
+	}
+}
+
+/*
+	二叉树的先序遍历 == 树的先根遍历 == 森林的先根遍历
+	二叉树的中序遍历 == 树的后根遍历 == 森林的中序遍历
+*/
+
+//森林的先序遍历 == 树的先根遍历 == 二叉树的先序遍历
+void pre_order_CSTree(CSTree T)
+{
+	if (T)
+	{
+		printf("%c\t", T->data);
+		pre_order_CSTree(T->fchild);
+		pre_order_CSTree(T->nextsibling);
+	}
+}
+
+//森林的中序遍历 == 二叉树的中序遍历 == 树的后根遍历
+void in_order_CSTree(CSTree T)
+{
+	if (T)
+	{
+		in_order_CSTree(T->fchild);
+		printf("%c\t", T->data);
+		in_order_CSTree(T->nextsibling);
+	}
+}
+
+int main()
+{
+	CSTree T;
+	Crt_CSTree(&T);
+	printf("得到森林的先序遍历为：\n");
+	pre_order_CSTree(T);
+	printf("\n得到森林的中序遍历为：\n");
+	in_order_CSTree(T);
+
+	return 0;
+}
