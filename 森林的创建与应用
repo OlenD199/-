@@ -1,0 +1,349 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 32
+
+typedef struct CSnode
+{
+	char data;
+	struct CSnode* fchild;
+	struct CSnode* nextsibling;
+}CSnode, * CSTree;
+
+typedef struct
+{
+	CSTree site[MAX];
+	int front;
+	int rear;
+	int QueueSize;
+}SqQueue;
+
+typedef struct snode
+{
+	CSTree place;
+	struct snode* next;
+}Snode, * LinkStack;
+
+void InitLinkStack(LinkStack* S)
+{
+	*S = NULL;
+}
+
+int LinkStackPush(LinkStack* S, CSTree p)
+{
+	LinkStack s = (LinkStack)malloc(sizeof(Snode));
+	s->place = p;
+	s->next = *S;
+	*S = s;
+	return 1;
+}
+
+int LinkStackPop(LinkStack* S)
+{
+	if ((*S) == NULL)
+		return 0;
+	LinkStack e = (*S);
+	(*S) = (*S)->next;
+	free(e);
+	return 1;
+}
+
+int LinkStackTravers(LinkStack S)
+{
+	if (S == NULL)
+		return 0;
+	LinkStack p = S;
+	while (p)
+	{
+		printf("%c\t", p->place->data);
+		p = p->next;
+	}
+	printf("\n");
+}
+
+void InitSqQueue(SqQueue* Q)
+{
+	Q->front = Q->rear = -1;
+	Q->QueueSize = MAX;
+}
+
+int SqEnQueue(SqQueue* Q, CSTree p)
+{
+	if ((Q->rear + 1) % Q->QueueSize == Q->front)
+		return 0;
+	Q->rear = (Q->rear + 1) % Q->QueueSize;
+	Q->site[Q->rear] = p;
+	return 1;
+}
+
+int SqDeQueue(SqQueue* Q)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	//*p = Q->site[Q->front];
+	Q->front = (Q->front + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqQueueEmpty(SqQueue Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+CSTree SqQueueGetHead(SqQueue Q)
+{
+	return Q.site[Q.front];
+}
+
+void Crt_CSTree(CSTree* T)
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	char fa;
+	char ch;
+	CSTree t;
+	CSTree p;
+	p = NULL;
+	printf("请输入边：\n");
+	scanf("%c %c", &fa, &ch);
+	while (ch != '#')
+	{
+		CSTree s = (CSTree)malloc(sizeof(CSnode));
+		s->data = ch;
+		s->fchild = s->nextsibling = NULL;
+		SqEnQueue(&Q, s);
+		if (fa == '#')
+			*T = s;
+		else
+		{
+			t = SqQueueGetHead(Q);
+			while (t->data != fa)
+			{
+				SqDeQueue(&Q);
+				t = SqQueueGetHead(Q);
+			}
+			if (t->fchild == NULL)
+			{
+				t->fchild = s;
+				p = s;
+			}
+			else
+			{
+				p->nextsibling = s;
+				p = s;
+			}
+		}
+		getchar();
+		scanf("%c %c", &fa, &ch);
+	}
+}
+
+void Pre_Order_CSTree(CSTree T)
+{
+	if (T)
+	{
+		printf("%c\t", T->data);
+		Pre_Order_CSTree(T->fchild);
+		Pre_Order_CSTree(T->nextsibling);
+	}
+}
+
+//树的结点查找
+void PreSearchCSTree(CSTree T, char ch, CSTree* p)
+{
+	if (T)
+	{
+		if (T->data == ch)
+		{
+			*p = T;
+			return;
+		}
+		else
+		{
+			PreSearchCSTree(T->fchild, ch, p);
+			PreSearchCSTree(T->nextsibling, ch, p);
+		}
+	}
+}
+
+//树的结点插入
+int InsertCSTree(CSTree* T, char ch, char fa)
+{
+	CSTree p;
+	CSTree s;
+	s = NULL;
+	p = NULL;
+	PreSearchCSTree(*T, fa, &p);
+	if (p)
+	{
+		s = (CSTree)malloc(sizeof(CSnode));
+		s->data = ch;
+		s->fchild = s->nextsibling = NULL;
+		CSTree t = p->fchild;
+		if (p->fchild == NULL)
+		{
+			p->fchild = s;
+		}
+		else
+		{
+			while (t->nextsibling != NULL)
+				t = t->nextsibling;
+			t->nextsibling = s;
+		}
+	}
+	return 1;
+}
+
+//后序依次释放内存
+void PostDelete(CSTree T)
+{
+	if (T)
+	{
+		PostDelete(T->fchild);
+		PostDelete(T->nextsibling);
+		free(T);
+	}
+}
+
+//完成子树的删除，并重接其他子树
+void Delete(CSTree pfa, CSTree pch)//CSTree=struct CSnode*  ，其本身是一个指针变量，这里pfa和pch都为一个为变量，所以这里就表示地址
+{
+	if (pfa->fchild == pch)//ch为父结点的第一个孩子
+	{
+		pfa->fchild = pch->nextsibling;
+		pch->nextsibling = NULL;//不能删除他的兄弟，所以要赋空
+		PostDelete(pch);
+	}
+	if (pfa->nextsibling == pch)
+	{
+		pfa->nextsibling = pch->nextsibling;
+		pch->nextsibling = NULL;
+		PostDelete(pch);
+	}
+}
+
+//树的结点删除
+void DeleteBiTree(CSTree* T, char fa, char ch)
+{
+	CSTree pfa = NULL;
+	CSTree pch = NULL;
+	if (fa == '#')
+	{
+		PostDelete(*T);
+		*T = NULL;
+		return;
+	}
+	else
+	{
+		PreSearchCSTree(*T, fa, &pfa);
+		PreSearchCSTree(*T, ch, &pch);
+		if (pfa == NULL || pch == NULL)
+		{
+			printf("数据有误不能删除!\n");
+			return;
+		}
+		else
+		{
+			if (pfa->fchild != pch)
+			{
+				pfa = pfa->fchild;
+				while (pfa->nextsibling != pch)
+					pfa = pfa->nextsibling;
+			}
+			Delete(pfa, pch);
+		}
+	}
+}
+
+//输出树的深度
+int CSTreeDepth(CSTree T)
+{
+	if (T == NULL)
+		return 0;
+	else
+	{
+		int d1 = CSTreeDepth(T->fchild);
+		int d2 = CSTreeDepth(T->nextsibling);
+		return (d1 + 1) > d2 ? d1 + 1 : d2;
+	}
+}
+
+//树的凹入表显示
+void DispCSTree(CSTree T, int level)
+{
+	int len = 1;
+	int n = 0;
+	int k = 0;
+	int i = 0;
+	if (T)
+	{
+		for (i = 0; i < level; i++)
+			printf(" ");
+		printf("%c", T->data);
+		printf("+");
+		for (k = i + len; k < 70; k++)
+			printf("-");
+		printf("\n");
+		DispCSTree(T->fchild, level + 4);
+		DispCSTree(T->nextsibling, level);
+	}
+}
+
+//求普通二叉树树中所有叶子节点的路径
+void ALLCSTreePath(CSTree T, LinkStack* S)
+{
+	if (T)
+	{
+		LinkStackPush(S, T);
+		if (T->fchild == NULL)
+			LinkStackTravers(*S);
+		else
+		{
+			ALLCSTreePath(T->fchild, S);
+			ALLCSTreePath(T->nextsibling, S);
+		}
+		LinkStackPop(S);
+	}
+}
+
+//求树中所有叶子结点的输出路径
+void AllTreePath(CSTree T, LinkStack* S)
+{
+	while (T)
+	{
+		LinkStackPush(S, T);
+		if (T->fchild == NULL)
+			LinkStackTravers(*S);
+		else
+			AllTreePath(T->fchild, S);
+		LinkStackPop(S);
+		T = T->nextsibling;
+	}
+}
+
+
+
+int main()
+{
+	CSTree T;
+	Crt_CSTree(&T);
+	Pre_Order_CSTree(T);
+	printf("\n");
+	int len = CSTreeDepth(T);
+	printf("%d\n", len);
+	InsertCSTree(&T, 'Q', 'B');
+	DeleteBiTree(&T, 'C', 'D');
+	DispCSTree(T, 0);
+	LinkStack S;
+	InitLinkStack(&S);
+	ALLCSTreePath(T, &S);
+	LinkStack S1;
+	InitLinkStack(&S1);
+	AllTreePath(T, &S1);
+
+	return 0;
+}
