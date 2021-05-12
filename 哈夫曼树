@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define N
+#define M			//结点数目（即要存放的数据数目）
+
+typedef struct
+{
+	char data;//存放数据
+	int weight;//权重
+	int parent;//父结点
+	int lchild;//左孩子
+	int rchild;//右孩子
+}NodeType;
+
+typedef NodeType HuffTree[M + 1];//结点数目从1开始，0的位置不存放
+typedef char** HuffCode;
+
+void Select(HuffTree ht, int n, int* s1, int* s2)//传入ht用于判断权值等相关数据
+{
+	int min;
+	int i = 0;
+	for (min = 100,i = 0; i < n * 2; i++)//最大权值为100
+	{
+		if (ht[i].parent == 0 && ht[i].weight != 0 && ht[i].weight <= min)
+		{
+			min = ht[i].weight;
+			*s1 = i;
+		}
+	}
+	for (min = 100, i = 0; i < n * 2; i++)//最大权值为100
+	{
+		if (ht[i].parent == 0 && ht[i].weight != 0 && ht[i].weight <= min && i != *s1)
+		{
+			min = ht[i].weight;
+			*s2 = i;
+		}
+	}
+}
+
+void Huff_Tree(int* w, int n, HuffTree ht)
+{
+	int i = 0;
+	int s1 = 0;
+	int s2 = 0;
+	for (i = 1; i < 2 * n; i++)//n表示二叉树的叶子结点数（即所要存放的数据数目），n个叶子结点有2n-1个结点数
+	{
+		if (i >= 1 && i <= n)
+			ht[i].weight = w[i - 1];//从1到n表示所要存放数据的数目，即二叉树中的叶子结点数目，这些有具体的数据
+		else
+			ht[i].weight = 0;//表示非叶子结点，权值为0
+		ht[i].parent = 0;
+		ht[i].lchild = 0;
+		ht[i].rchild = 0;
+	}
+	for (i = n + 1; i < 2 * n; i++)//该操作用于创建非叶子结点，非叶子结点有n-1个，所以循环n-1次，前面将1-n为叶子结点，则其他的为非叶子结点
+	{
+		Select(ht, n, &s1, &s2);//该函数用于找到两个权值最小的，且其父结点为0,s1和s2表示权值最小的两个下标
+		ht[i].weight = ht[s1].weight + ht[i].weight;
+		ht[s1].parent = ht[s2].parent = i;
+		ht[i].lchild = s1;
+		ht[i].rchild = s2;
+	}
+}
+
+int main()
+{
+
+
+	return 0;
+}
