@@ -1,0 +1,516 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define M 32
+
+typedef struct tnode
+{
+	char data[M];
+	struct tnode* lchild;
+	struct tnode* rchild;
+}Tnode, * BiTree;
+
+/*
+typedef struct qnode
+{
+	BiTree site;
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+int InitLinkQueue(QLink* Q)
+{
+	Q->front = Q->rear = (LinkQueue)malloc(sizeof(Qnode));
+	if (Q->front == NULL)
+		return 0;
+	Q->front->next = NULL;
+	return 1;
+}
+
+int LinkEnQueue(QLink* Q, BiTree p)
+{
+	LinkQueue q;
+	q = (LinkQueue)malloc(sizeof(Qnode));
+	if (q == NULL)
+		return 0;
+	q->site = p;
+	Q->rear->next = q;
+	Q->rear = q;
+	return 1;
+}
+
+int LinkDeQueue(QLink* Q, BiTree* p)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	*p = Q->front->next->site;
+	LinkQueue q;
+	q = Q->front->next;
+	Q->front->next = q->next;
+	if (q == Q->rear)
+		Q->rear = Q->front;
+	free(q);
+	return 1;
+}
+
+int LinkQueueEmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+BiTree LinkQueueGetHead(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return NULL;
+	BiTree p;
+	p = Q.front->next->site;
+	return p;
+}
+
+*/
+
+/*
+typedef struct
+{
+	BiTree place[M];
+	int top;
+	int StackSize;
+}SqStack;
+
+void InitSqStack(SqStack* S)
+{
+	S->top = -1;
+	S->StackSize = M;
+}
+
+int SqStackPush(SqStack* S, BiTree p)
+{
+	if (S->top + 1 == S->StackSize)
+		return 0;
+	S->top++;
+	S->place[S->top] = p;
+	return 1;
+}
+
+int SqStackPop(SqStack* S, BiTree* p)
+{
+	if (S->top == -1)
+		return 0;
+	*p = S->place[S->top];
+	S->top--;
+	return 1;
+}
+
+int SqStackEmpty(SqStack S)
+{
+	if (S.top == -1)
+		return 1;
+	return 0;
+}
+
+int SqStackGetTop(SqStack S, BiTree* p)
+{
+	if (S.top == -1)
+		return 0;
+	*p = S.place[S.top];
+	return 1;
+}
+
+*/
+
+typedef struct snode
+{
+	BiTree place;
+	struct snode* next;
+}Snode,* LinkStack;
+
+void InitLinkStack(LinkStack* S)
+{
+	*S = NULL;
+}
+
+int LinkStackPush(LinkStack* S, BiTree p)
+{
+	LinkStack q = (LinkStack)malloc(sizeof(Snode));
+	if (q == NULL)
+		return 0;
+	(*S)->place = p;
+	q->next = (*S);
+	(*S) = q;
+	return 1;
+}
+
+int LinkStackPop(LinkStack* S, BiTree p)
+{
+	if (*S == NULL)
+		return 0;
+	LinkStack q = *S;
+	(*S) = (*S)->next;
+	p = q->place;
+	free(q);
+	return 1;
+}
+
+int LinkStackEmpty(LinkStack S)
+{
+	if (S == NULL)
+		return 1;
+	return 0;
+}
+
+int LinkStackGetTop(LinkStack S, BiTree* p)
+{
+	if (S == NULL)
+		return 0;
+	*p = S->place;
+	return 1;
+}
+
+typedef struct
+{
+	BiTree site[M];
+	int front;
+	int rear;
+	int QueueSize;
+}SqQueue;
+
+void InitSqQueue(SqQueue* Q)
+{
+	Q->front = Q->rear = 0;
+	Q->QueueSize = M;
+}
+
+int SqEnQueue(SqQueue* Q, BiTree p)
+{
+	if ((Q->rear + 1) % Q->QueueSize == Q->front)
+		return 0;
+	Q->site[Q->rear] = p;
+	Q->rear = (Q->rear + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqDeQueue(SqQueue* Q, BiTree* p)
+{
+	if (Q->front == Q->rear)
+		return 0;
+	*p = Q->site[Q->front];
+	Q->front = (Q->front + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqQueueEmpty(SqQueue Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+BiTree SqQueueGetHead(SqQueue Q)
+{
+	return Q.site[Q.front];
+}
+
+void menu()
+{		
+	printf("1.遍历创建二叉树				2.输入边创建二叉树\n");
+	printf("3.先序遍历二叉树				4.凹入输出二叉树\n");
+	printf("5.层次遍历二叉树				6.根据结点数据返回指针\n");
+	printf("7.根据结点数据域返回父结点指针			8.删除结点\n");
+	printf("9.插入结点					10.复制二叉树\n");
+	printf("11.求二叉树的深度				0.退出\n");
+}
+
+void CrtTreeByRec(BiTree* T)
+{
+	char ch[M] = { 0 };
+	scanf("%s", ch);
+	if (strcmp(ch, "#") == 0)
+		*T = NULL;
+	else
+	{
+		*T = (BiTree)malloc(sizeof(Tnode));
+		strcpy((*T)->data, ch);
+		CrtTreeByRec(&(*T)->lchild);
+		CrtTreeByRec(&(*T)->rchild);
+	}
+}
+
+void CrtTreeBySide(BiTree* T)
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	char father[M];
+	char self[M];
+	int status;
+	BiTree c;
+	printf("请输入父亲结点数据，该结点数据，二者关系:\n");
+	scanf("%s %s %d", father, self, &status);
+	while (self[0] != '#')
+	{
+		BiTree p = (BiTree)malloc(sizeof(Tnode));
+		strcpy(p->data, self);
+		p->lchild = p->rchild = NULL;
+		SqEnQueue(&Q, p);
+		if (father[0] != '#')
+			*T = p;
+		else
+		{
+			c = SqQueueGetHead(Q);
+			while (strcmp(c->data, father) != 0)
+			{
+				SqDeQueue(&Q, &c);
+				c = SqQueueGetHead(Q);
+			}
+			if (status == 0)
+				c->lchild = p;
+			else if (status == 1)
+				c->rchild = p;
+		}
+		scanf("%s %s %d", father, self, &status);
+	}
+}
+
+void PreOrder(BiTree T)
+{
+	if (T)
+	{
+		printf("%s\t", T->data);
+		PreOrder(T->lchild);
+		PreOrder(T->rchild);
+	}
+}
+
+void PrintByIndent(BiTree T, int level, char ch)
+{
+	if (T)
+	{
+		for (int i = 0; i < level; i++)
+			printf("\t");
+		printf("%s(%c)", T->data, ch);
+		for (int i = 0; i < 70; i++)
+			printf("-");
+		printf("\n");
+		PrintByIndent(T->lchild, level + 1, 'L');
+		PrintByIndent(T->rchild, level + 1, 'R');
+	}
+}
+
+void PrintByArrange(BiTree T)
+{
+	SqQueue Q;
+	InitSqQueue(&Q);
+	if (T)
+		SqEnQueue(&Q, T);
+	while (!SqQueueEmpty(Q))
+	{
+		BiTree c;
+		SqDeQueue(&Q, &c);
+		printf("%s\t", c->data);
+		if (c->lchild)
+			SqEnQueue(&Q, c->lchild);
+		if (c->rchild)
+			SqEnQueue(&Q, c->rchild);
+	}
+}
+
+void RetPointerByData(BiTree T, char* TemVar, BiTree* Pointer)
+{
+	if (T)
+	{
+		if (strcmp(TemVar, T->data) == 0)
+			*Pointer = T;
+		else
+		{
+			RetPointerByData(T->lchild, TemVar, Pointer);
+			RetPointerByData(T->rchild, TemVar, Pointer);
+		}
+	}
+}
+
+void RetFaPointerBydata(BiTree T, char* TemVar_Ch,BiTree TemVarTr, BiTree* TemVarFaTr)
+{
+	if (T)
+	{
+		if (strcmp(TemVar_Ch, T->data) == 0)
+		{
+			*TemVarFaTr = TemVarTr;
+		}
+		else
+		{
+			RetFaPointerBydata(T->lchild, TemVar_Ch, T, TemVarFaTr);
+			RetFaPointerBydata(T->rchild, TemVar_Ch, T, TemVarFaTr);
+		}
+	}
+}
+
+void DesToryBiTree(BiTree T)
+{
+	if (T)
+	{
+		DesToryBiTree(T->lchild);
+		DesToryBiTree(T->rchild);
+		free(T);
+	}
+}
+
+void DeleteNodeByData(BiTree* T, char* TemVar_Ch)
+{
+	if (*T)
+	{
+		if (strcmp(TemVar_Ch, (*T)->data) == 0)
+		{
+			DesToryBiTree((*T));
+			*T = NULL;
+		}
+		else
+		{
+			DeleteNodeByData(&(*T)->lchild, TemVar_Ch);
+			DeleteNodeByData(&(*T)->rchild, TemVar_Ch);
+		}
+	}
+}
+
+void InsertByData(BiTree* T, char* TemVarIn, char* TemVar_Ch)
+{
+	BiTree ptr = NULL;
+	RetPointerByData(*T, TemVar_Ch, &ptr);
+	if (ptr)
+	{
+		if (ptr->lchild != NULL)
+			if (strcmp(ptr->lchild->data, TemVarIn) == 0)
+				printf("同名子结点已存在！\n");
+		if (ptr->rchild != NULL)
+			if (strcmp(ptr->rchild->data, TemVarIn) == 0)
+				printf("同名子结点已存在！\n");
+		if (ptr->lchild != NULL && ptr->rchild != NULL)
+			printf("该父结点没有位置\n");
+		BiTree c = (BiTree)malloc(sizeof(Tnode));
+		strcpy(c->data, TemVarIn);
+		c->lchild = c->rchild = NULL;
+		if (ptr->lchild == NULL)
+		{
+			ptr->lchild = c;
+		}
+		else if (ptr->lchild != NULL && ptr->rchild == NULL)
+		{
+			ptr->rchild = c;
+		}
+	}
+	else
+	{
+		printf("父结点不存在！\n");
+	}
+}
+
+void CopyTreeToT2(BiTree* Tcpy, BiTree T)
+{
+	if (T)
+	{
+		BiTree c = (BiTree)malloc(sizeof(Tnode));
+		strcpy(c->data, T->data);
+		c->lchild = c->rchild = NULL;
+		*Tcpy = c;
+		CopyTreeToT2(&(*Tcpy)->lchild, T->lchild);
+		CopyTreeToT2(&(*Tcpy)->rchild, T->rchild);
+	}
+}
+
+int GetBiTreeLength(BiTree T)
+{
+	if (T)
+	{
+		int l1 = GetBiTreeLength(T->lchild);
+		int l2 = GetBiTreeLength(T->rchild);
+		if (l1 > l2)
+			return l1 + 1;
+		else
+			return l2 + 1;
+	}
+	else
+		return 0;
+}
+
+int main()
+{
+	BiTree T = NULL;
+	int num = 1;
+	int TreeLength = 0;
+	BiTree TemVar_T = NULL;
+	BiTree TemVar_T2 = NULL;
+	char TemVar_Ch[M] = { 0 };
+	char TemVarIn[M] = { 0 };
+	while (num)
+	{
+		menu();
+		printf("请输入相关操作数：>\t");
+		scanf("%d", &num);
+		switch (num)
+		{
+		case 1:
+			CrtTreeByRec(&T);
+			break;
+		case 2:
+			CrtTreeBySide(&T);
+			break;
+		case 3:
+			PreOrder(T);
+			printf("\n");
+			break;
+		case 4:
+			PrintByIndent(T, 0, 'D');
+			printf("\n");
+			break;
+		case 5:
+			PrintByArrange(T);
+			printf("\n");
+			break;
+		case 6:
+			printf("请输入相关数据:\n");
+			scanf("%s", TemVar_Ch);
+			RetPointerByData(T, TemVar_Ch, &TemVar_T);
+			if(TemVar_T != NULL)
+				printf("得到指针所指向的数据为:>%s ,左孩子数据为:>%s 右孩子数据为:>%s\n", TemVar_T->data, TemVar_T->lchild->data, TemVar_T->rchild->data);
+			break;
+		case 7:
+			printf("请输入相关数据：\n");
+			scanf("%s", TemVar_Ch);
+			RetFaPointerBydata(T, TemVar_Ch, TemVar_T, &TemVar_T2);
+			printf("得到指针所指向的数据为:>%s ,左孩子数据为:>%s 右孩子数据为:>%s\n", TemVar_T2->data, TemVar_T2->lchild->data, TemVar_T2->rchild->data);
+			break;
+		case 8:
+			printf("请输入相关数据：\n");
+			scanf("%s", TemVar_Ch);
+			DeleteNodeByData(&T, TemVar_Ch);
+			break;
+		case 9:
+			printf("请输入要插入的数据：>\t");
+			scanf("%s", TemVarIn);
+			printf("请输入要插入的位置的父结点相关数据：>\t");
+			scanf("%s", TemVar_Ch);
+			InsertByData(&T, TemVarIn, TemVar_Ch);
+			break;
+		case 10:
+			BiTree T2;
+			CopyTreeToT2(&T2, T);
+			printf("复制得到二叉树的层次遍历:\n");
+			PrintByArrange(T2);
+			printf("\n");
+			break;
+		case 11:
+			TreeLength = GetBiTreeLength(T);
+			printf("该二叉树的深度为：>%d\n", TreeLength);
+			break;
+
+		}
+	}
+
+	return 0;
+}
