@@ -1,0 +1,482 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define M 32
+
+typedef struct tnode
+{
+	char data[M];
+	struct tnode* fchild;
+	struct tnode* nextsibling;
+}Tnode, * CSTree;
+
+/*
+typedef struct qnode
+{
+	CSTree site;
+	struct qnode* next;
+}Qnode, * LinkQueue;
+
+typedef struct
+{
+	LinkQueue front;
+	LinkQueue rear;
+}QLink;
+
+int InitLinkQueue(QLink* Q)
+{
+	Q->front = Q->rear = (LinkQueue)malloc(sizeof(Qnode));
+	if (Q->front == NULL)
+		return 0;
+	Q->front->next = NULL;
+	return 1;
+}
+
+int LinkEnQueue(QLink* Q, CSTree e)
+{
+	LinkQueue p = (LinkQueue)malloc(sizeof(Qnode));
+	if (p == NULL)
+		return 0;
+	p->site = e;
+	p->next = NULL;//必要操作
+	Q->rear->next = p;
+	Q->rear = p;
+	return 1;
+}
+
+int LinkDeQueue(QLink* Q, CSTree* e)
+{
+	if (Q->rear == Q->front)
+		return 0;
+	LinkQueue p = Q->front->next;
+	Q->front->next = p->next;
+	*e = p->next->site;
+	if (p = Q->rear)
+		Q->rear = Q->front;
+	free(p);
+	return 1;
+}
+
+int LinkQueueQmpty(QLink Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+int LinkQueueGetHead(QLink Q, CSTree* e)
+{
+	if (Q.front == Q.rear)
+		return 0;
+	*e = Q.front->next->site;
+	return 1;
+}
+*/
+
+typedef struct
+{
+	CSTree* site;
+	int front;
+	int rear;
+	int QueueSize;
+}SqQueue;
+
+
+/*
+typedef struct snode
+{
+	CSTree place;
+	struct snode* next;
+}Snode, * LinkStack;
+
+void InitLinkStack(LinkStack* S)
+{
+	*S = NULL;
+}
+
+int LinkStackPush(LinkStack* S, CSTree e)
+{
+	LinkStack p = (LinkStack)malloc(sizeof(Snode));
+	if (p == NULL)
+		return 0;
+	p->place = e;
+	p->next = *S;
+	*S = p;
+	return 1;
+}
+
+int LinkStackPop(LinkStack* S, CSTree* e)
+{
+	if (*S == NULL)
+		return 0;
+	LinkStack p = (*S);
+	(*S) = (*S)->next;
+	*e = p->place;
+	free(p);
+	return 1;
+}
+
+int LinkStackEmpty(LinkStack S)
+{
+	if (S == NULL)
+		return 1;
+	return 0;
+}
+
+int LinkSTackGetTop(LinkStack S, CSTree* e)
+{
+	if (S == NULL)
+		return 0;
+	*e = S->place;
+	return 1;
+}
+*/
+
+int InitSqQueue(SqQueue* Q)
+{
+	Q->site = (CSTree*)malloc(sizeof(CSTree) * M);
+	if (Q->site == NULL)
+		return 0;
+	Q->front = Q->rear = 0;
+	Q->QueueSize = M;
+	return 1;
+}
+
+int SqEnQueue(SqQueue* Q, CSTree e)
+{
+	if (Q->front = Q->rear)
+		return 0;
+	Q->site[Q->front] = e;
+	Q->front = (Q->front + 1) % Q->QueueSize;
+	return 1;
+}
+
+int SqDeQueue(SqQueue* Q, CSTree* e)
+{
+	if (Q->rear == Q->front)
+		return 0;
+	*e = Q->site[Q->front];
+	Q->front = (Q->front + 1) % Q->front;
+	return 1;
+}
+
+int SqQueueEmpty(SqQueue Q)
+{
+	if (Q.front == Q.rear)
+		return 1;
+	return 0;
+}
+
+int SqQueueGetHead(SqQueue Q, CSTree* e)
+{
+	if (Q.front == Q.rear)
+		return 0;
+	*e = Q.site[Q.front];
+	return 1;
+}
+
+
+typedef struct
+{
+	CSTree place[M];
+	int top;
+	int StackSize;
+}SqStack;
+
+void InitSqStack(SqStack* S)
+{
+	S->top = -1;
+	S->StackSize = M;
+}
+
+int SqStackPush(SqStack* S, CSTree e)
+{
+	if (S->top + 1 == S->StackSize)
+		return 0;
+	S->top++;
+	S->place[S->top] = e;
+	return 1;
+}
+
+int SqStackPop(SqStack* S)
+{
+	if (S->top == -1)
+		return 0;
+	//*e = S->place[S->top];
+	S->top--;
+	return 1;
+}
+
+int SqStackEmpty(SqStack S)
+{
+	if (S.top == -1)
+		return 1;
+	return 0;
+}
+
+int SqStackGetTop(SqStack S, CSTree* e)
+{
+	if (S.top == -1)
+		return 0;
+	*e = S.place[S.top];
+	return 1;
+}
+
+int SqStackTravers(SqStack S)
+{
+	if (S.top == -1)
+		return 0;
+	for (int i = 0; i < S.top; i++)
+		printf("%s\t", S.place[i]->data);
+	printf("\n");
+	return 1;
+}
+
+void menu()
+{
+	printf("1.输入边创建对应二叉树			2.树的结点查找\n");
+	printf("3.树的结点插入				4.树的结点删除\n");
+	printf("5.树的深度				6.树的凹入输出\n");
+	printf("7.树中叶子结点所有路径			0.退出\n");
+}
+
+void CrtCSTreeByPrintSide(CSTree* T)
+{
+	char ch_1[M] = { 0 };
+	char ch_2[M] = { 0 };
+	printf("请输入父结点数据和子结点数据：\n");
+	scanf("%s %s", ch_1, ch_2);
+	SqQueue Q;
+	InitSqQueue(&Q);
+	CSTree c = NULL;
+	CSTree t = NULL;
+	while (ch_2[0] != '#')
+	{
+		CSTree p = (CSTree)malloc(sizeof(Tnode));
+		strcpy(p->data, ch_2);
+		p->fchild = p->nextsibling = NULL;
+		SqEnQueue(&Q, p);
+		if (ch_1[0] == '#')
+			*T = p;
+		else
+		{
+			SqQueueGetHead(Q, &c);
+			while (strcmp(ch_1, c->data) != 0)
+			{
+				SqDeQueue(&Q, &c);
+				SqQueueGetHead(Q, &c);
+			}
+			if (c->fchild == NULL)
+			{
+				c->fchild = p;
+				t = p;
+			}
+			else
+			{
+				t->nextsibling = p;
+				t = p;
+			}
+		}
+		scanf("%s %s", ch_1, ch_2);
+	}
+}
+
+void RetSiteByData(CSTree T, char* TemVar_Ch1, CSTree* TemVar_CST)
+{
+	if (T)
+	{
+		if (strcmp(TemVar_Ch1, T->data) == 0)
+		{
+			*TemVar_CST = T;
+			return;
+		}
+		else
+		{
+			RetSiteByData(T->fchild, TemVar_Ch1, TemVar_CST);
+			RetSiteByData(T->nextsibling, TemVar_Ch1, TemVar_CST);
+		}
+	}
+}
+
+int InsertByData(CSTree* T, char* TemVar_fa, char* TemVar_se)
+{
+	CSTree TemVar_Ptr = NULL;
+	CSTree c = NULL;
+	RetSiteByData(*T, TemVar_fa, &TemVar_Ptr);
+	if (TemVar_Ptr == NULL)
+		return 0;
+	else
+	{
+		CSTree p = (CSTree)malloc(sizeof(Tnode));
+		p->fchild = p->nextsibling = NULL;
+		if (TemVar_Ptr->fchild == NULL)
+			TemVar_Ptr->fchild = p;
+		else
+		{
+			c = TemVar_Ptr->nextsibling;
+			while (c != NULL)
+				c = c->nextsibling;
+			c = p;
+		}
+	}
+	return 1;
+}
+
+void PostDestory(CSTree T)
+{
+	if (T)
+	{
+		PostDestory(T->fchild);
+		PostDestory(T->nextsibling);
+		free(T);
+	}
+}
+
+void DeleteCSTree(CSTree TemVar_PtrFa, CSTree TemVar_PtrSe)
+{
+	if (TemVar_PtrFa->fchild == TemVar_PtrSe)
+	{
+		TemVar_PtrFa->fchild = TemVar_PtrSe->nextsibling;
+		TemVar_PtrSe->nextsibling = NULL;
+		PostDestory(TemVar_PtrSe);
+	}
+	if (TemVar_PtrFa->nextsibling == TemVar_PtrSe)
+	{
+		TemVar_PtrFa->nextsibling = TemVar_PtrSe->nextsibling;
+		TemVar_PtrSe->nextsibling = NULL;
+		PostDestory(TemVar_PtrSe);
+	}
+}
+
+void DeleteByData(CSTree* T, char* TemVar_fa, char* TemVar_se)
+{
+	if (TemVar_fa[0] == '#')
+	{
+		PostDestory(*T);
+		*T = NULL;
+	}
+	CSTree TemVar_PtrFa = NULL;
+	CSTree TemVar_PtrSe = NULL;
+	RetSiteByData(*T, TemVar_fa, &TemVar_PtrFa);
+	RetSiteByData(*T, TemVar_fa, &TemVar_PtrSe);
+	if (TemVar_PtrFa == NULL || TemVar_PtrSe == NULL)
+	{
+		printf("数据有误，不能删除!\n");
+		return;
+	}
+	else
+	{
+		if (TemVar_PtrFa->fchild != TemVar_PtrSe)
+		{
+			TemVar_PtrFa = TemVar_PtrFa->fchild;
+			while (TemVar_PtrFa->nextsibling != TemVar_PtrSe)
+			{
+				TemVar_PtrFa = TemVar_PtrFa->nextsibling;
+			}
+		}
+		DeleteCSTree(TemVar_PtrFa, TemVar_PtrSe);
+	}
+}
+
+int CSTreeGetLength(CSTree T)
+{
+	if (T)
+	{
+		int d1 = CSTreeGetLength(T->fchild);
+		int d2 = CSTreeGetLength(T->nextsibling);
+		if (d1 + 1 > d2)
+			return d1 + 1;
+		else
+			return d2;
+	}
+	else
+		return 0;
+}
+
+void PrintInDen(CSTree T, int level)
+{
+	if (T)
+	{
+		int len = strlen(T->data);
+		for (int i = 0; i < level; i++)
+			printf("\t");
+		printf("%s", T->data);
+		for (int i = 8 * len; i < 100; i++)
+			printf("-");
+		printf("\n");
+		PrintInDen(T->fchild, level + 1);
+		PrintInDen(T->nextsibling, level + 1);
+	}
+}
+
+void PrintAllPath(CSTree T, SqStack* S)
+{
+	if (T)
+	{
+		SqStackPush(S, T);
+		if (T->fchild == NULL)
+			SqStackTravers(*S);
+		else
+			PrintAllPath(T->fchild, S);
+		SqStackPop(S);
+		T = T->nextsibling;
+	}
+
+}
+
+int main()
+{
+	CSTree T = NULL;
+	CSTree TemVar_CST = NULL;
+	char TemVar_Ch1[M] = { 0 };
+	char TemVar_Ch2[M] = { 0 };
+	int num = 1;
+	int length = 0;
+	while (1)
+	{
+		menu();
+		printf("请输入相关操作数:>\t");
+		scanf("%d", &num);
+		switch (num)
+		{
+		case 1:
+			CrtCSTreeByPrintSide(&T);
+			break;
+		case 2:
+			printf("请输入相关数据：>\t");
+			scanf("%s", TemVar_Ch1);
+			RetSiteByData(T, TemVar_Ch1, &TemVar_CST);
+			if (TemVar_CST != NULL)
+				printf("返回指针所指向的数据为：>\t%s\n", TemVar_CST->data);
+			else
+				printf("未找到！\n");
+			break;
+		case 3:
+			printf("请输入父结点和子结点信息:>\t");
+			scanf("%s %s", TemVar_Ch1, TemVar_Ch2);
+			InsertByData(&T, TemVar_Ch1, TemVar_Ch2);
+			break;
+		case 4:
+			printf("请输入父结点和子结点信息:>\t");
+			scanf("%s %s", TemVar_Ch1, TemVar_Ch2);
+			DeleteByData(&T, TemVar_Ch1, TemVar_Ch2);
+			break;
+		case 5:
+			length = CSTreeGetLength(T);
+			printf("树的深度为%d\n", length);
+			break;
+		case 6:
+			PrintInDen(T, 0);
+			break;
+		case 7:
+			SqStack S;
+			InitSqStack(&S);
+			PrintAllPath(T, &S);
+			break;
+
+		}
+
+	}
+	return 0;
+}
